@@ -2,14 +2,15 @@
 #pragma once
 #include "StateMachineMngr.h"
 #include "Screen.h"
+#include "raylib.h"
 
 class ScreenTitleState : public StateMachineMngr
 {
 public:
 
-	void enter(Screen* screen){}
-	void toggle(Screen* screen){};
-	void exit(Screen* screen){};
+	void enter(Screen* screen) {}
+	void toggle(Screen* screen) {};
+	void exit(Screen* screen) {};
 
 	void InitScreen(void);
 	void UpdateScreen(float deltaTime);
@@ -23,11 +24,10 @@ public:
 
 private:
 
-	ScreenTitleState(){};
+	ScreenTitleState() {};
 	ScreenTitleState(const ScreenTitleState& other);
 	ScreenTitleState& operator= (const ScreenTitleState& other);
 
-	int framesCounter = 0;
+	Texture2D logo_{};
 	int finishScreen = 0;
-
 };

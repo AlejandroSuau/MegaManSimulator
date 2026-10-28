@@ -1,5 +1,4 @@
 #include "ScreenTitle.h"
-#include "raylib.h"
 #include "Game/Managers/GameManager.h"
 
 ScreenTitleState& ScreenTitleState::getInstance()
@@ -11,22 +10,15 @@ ScreenTitleState& ScreenTitleState::getInstance()
 
 void ScreenTitleState::InitScreen(void)
 {
-	framesCounter = 0;
-	finishScreen = 0;
+	finishScreen = 0; 
 	TraceLog(LOG_INFO, "ScreenTitleState::InitScreen");
 
-	// Use this to access to the Game instance
-	GameManager& GameInst = GameManager::GetGameManager();
-
-
+	logo_ = LoadTexture("resources/Menu/MainMenu.png");
 }
 
 void ScreenTitleState::UpdateScreen(float deltaTime)
 {
-	GameManager& GameInst = GameManager::GetGameManager();
-
-
-	if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+	if (IsKeyPressed(KEY_ENTER))
 	{
 		finishScreen = 2;   // GAMEPLAY
 	}
@@ -43,14 +35,22 @@ void ScreenTitleState::DrawScreen(void)
 
 	GameManager& GameInst = GameManager::GetGameManager();
 
-	float posx = ((GetScreenWidth() / 2.f) - (MeasureText("by Ester A.", 20) / 2.f));
+	const auto logoWidth = static_cast<float>(logo_.width);
+	const auto logoHeight = static_cast<float>(logo_.height);
+	Rectangle srcRect{ 0.f, 0.f, logoWidth, logoHeight };
+	Rectangle dstRect{ GetScreenWidth() / 3 - logoWidth / 2 + 175, 100, logoWidth, logoHeight };
 
-	DrawTextEx(GameInst.GetFont(), " by Ester A.", Vector2{ posx, 450.f }, 20, 4, WHITE);
+	DrawTexturePro(logo_, srcRect, dstRect, { 0.f, 0.f }, 0.f, WHITE);
 
-	DrawText("Press Enter for Playing", (GetScreenWidth() / 2) - (MeasureText("Press Enter for Playing", 25) / 2), 500, 25, WHITE);
-	DrawText("Press 'O' for Instructions", (GetScreenWidth() / 2) - (MeasureText("Press 'O' for Instructions", 25) / 2), 560, 25, WHITE);
+	const char* by_credits = "By Alejandro Suau R.";
+	float posx = static_cast<float>((GetScreenWidth() / 3) - (MeasureText(by_credits, 20) / 2));
 
+	DrawTextEx(GameInst.GetFont(), by_credits, Vector2{ posx, 450.f }, 20, 4, WHITE);
 
+	static const char* text_1 = "Press Enter for Playing";
+	static const char* text_2 = "Press 'O' for Instructions";
+	DrawText(text_1, (GetScreenWidth() / 3) - (MeasureText(text_1, 25) / 2), 500, 25, WHITE);
+	DrawText(text_2, (GetScreenWidth() / 3) - (MeasureText(text_2, 25) / 2), 560, 25, WHITE);
 }
 
 void ScreenTitleState::UnloadScreen(void)
