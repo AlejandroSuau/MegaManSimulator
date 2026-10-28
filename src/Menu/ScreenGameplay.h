@@ -1,6 +1,8 @@
 #pragma once
 #include "StateMachineMngr.h"
 
+#include "raylib.h"
+
 class ScreenGameplayState : public StateMachineMngr
 {
 public:
@@ -24,10 +26,12 @@ private:
 	ScreenGameplayState(const ScreenGameplayState& other);
 	ScreenGameplayState& operator= (const ScreenGameplayState& other);
 
-	void EvaluateInput();
+	void EvaluateInput(float deltaTime);
 	
 	void DebugOptions();
 	void DrawDebug();
+
+	Texture2D stageTexture_{};
 
 	int framesCounter = 0;
 	int finishScreen = 0;

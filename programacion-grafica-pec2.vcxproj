@@ -316,7 +316,6 @@
     <ClInclude Include="src\Menu\ScreenOptions.h" />
     <ClInclude Include="src\Menu\ScreenTitle.h" />
     <ClInclude Include="src\Menu\StateMachineMngr.h" />
-    <ClInclude Include="src\resource_dir.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Game\Character.cpp" />

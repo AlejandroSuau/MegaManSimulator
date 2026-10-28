@@ -45,7 +45,8 @@ public:
 	void MapsForwardProgression();
 	void MapsBackwardProgression();
 
-
+	Camera2D& GetCamera() { return camera; }
+	void ResetCamera();
 
 	static GameManager& GetGameManager();
 
@@ -58,6 +59,7 @@ private:
 	void UpdateTransition(void);         // Update transition effect
 	void DrawTransition(void);           // Draw transition effect (full-screen rectangle)
 
+	Camera2D camera{};
 
 	float transAlpha = 0.0f;
 	bool onTransition = false;

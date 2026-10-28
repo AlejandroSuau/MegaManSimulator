@@ -234,10 +234,17 @@ void GameManager::ClearGameVar()
 {
     score = 0;
     seconds = 0;
-    
-
 }
 
+void GameManager::ResetCamera()
+{
+    camera = Camera2D{};
+
+    camera.target = Vector2{ 0.0f, 0.0f };
+    camera.offset = Vector2{ 0.0f, 0.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+}
 
 void GameManager::MapsForwardProgression()
 {

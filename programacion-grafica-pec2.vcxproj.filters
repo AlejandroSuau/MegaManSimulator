@@ -27,9 +27,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\resource_dir.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Menu\Screen.h">
       <Filter>Menu</Filter>
     </ClInclude>

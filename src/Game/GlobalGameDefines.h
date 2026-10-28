@@ -9,6 +9,7 @@ namespace GameGlobalVar
 {
 	const int screenWidth = 1280;
 	const int screenHeight = 800;
+	const float cameraSpeed = 600.f;
 
 	const int gravity = 400;
 }
