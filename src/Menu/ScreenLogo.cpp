@@ -1,9 +1,17 @@
 #include "ScreenLogo.h"
-#include "raylib.h"
+
+#include <algorithm>
+
+namespace
+{
+    constexpr float FADE_IN_TIME = 1.0f;
+    constexpr float DISPLAY_TIME = 1.0f;
+    constexpr float FADE_OUT_TIME = 1.0f;
+}
 
 ScreenLogoState::ScreenLogoState()
-	: chargeTime_(0)
-{}
+{
+}
 
 ScreenLogoState& ScreenLogoState::getInstance()
 {
@@ -14,112 +22,57 @@ ScreenLogoState& ScreenLogoState::getInstance()
 //-------------------------------------------------------------
 void ScreenLogoState::InitScreen(void)
 {
-    framesCounter = 0;
-    lettersCount = 0;
+    alpha_ = 1.0f;
 
-    logoPositionX = GetScreenWidth() / 2 - 128;
-    logoPositionY = GetScreenHeight() / 2 - 128;
-
-    topSideRecWidth = 16;
-    leftSideRecHeight = 16;
-    bottomSideRecWidth = 16;
-    rightSideRecHeight = 16;
-
-    state = 0;
-    alpha = 1.0f;
+    logo_ = LoadTexture("resources/Logo-TheTrueBooleanGames.png");
 }
 
 //-------------------------------------------------------------
 void ScreenLogoState::UpdateScreen(float deltaTime)
 {
-    if (state == 0)                 // State 0: Top-left square corner blink logic
-    {
-        framesCounter++;
-
-        if (framesCounter == 80)
-        {
-            state = 1;
-            framesCounter = 0;      // Reset counter... will be used later...
-        }
+    chargeTime_ += deltaTime;
+    if (chargeTime_ < FADE_IN_TIME) {
+        // Fade In
+        alpha_ = chargeTime_ / FADE_IN_TIME;
     }
-    else if (state == 1)            // State 1: Bars animation logic: top and left
-    {
-        topSideRecWidth += 8;
-        leftSideRecHeight += 8;
-
-        if (topSideRecWidth == 256) state = 2;
+    else if (chargeTime_ < FADE_IN_TIME + DISPLAY_TIME) {
+        // Showing N seconds
+        alpha_ = 1.f;
     }
-    else if (state == 2)            // State 2: Bars animation logic: bottom and right
-    {
-        bottomSideRecWidth += 8;
-        rightSideRecHeight += 8;
-
-        if (bottomSideRecWidth == 256) state = 3;
+    else if (chargeTime_ < FADE_IN_TIME + DISPLAY_TIME + FADE_OUT_TIME) {
+        // Fade Out
+        const float fadeOutProgress = (chargeTime_ - FADE_IN_TIME - DISPLAY_TIME) / FADE_OUT_TIME;
+        alpha_ = 1.f - fadeOutProgress;
     }
-    else if (state == 3)            // State 3: "raylib" text-write animation logic
-    {
-        framesCounter++;
-
-        if (lettersCount < 10)
-        {
-            if (framesCounter / 12)   // Every 12 frames, one more letter!
-            {
-                lettersCount++;
-                framesCounter = 0;
-            }
-        }
-        else    // When all letters have appeared, just fade out everything
-        {
-            if (framesCounter > 200)
-            {
-                alpha -= 0.02f;
-
-                if (alpha <= 0.0f)
-                {
-                    alpha = 0.0f;
-                    finishScreen = 1;   // Jump to next screen
-                }
-            }
-        }
+    else {
+        // End
+        alpha_ = 0.f;
+        finishScreen_ = 1;
     }
 }
 
 //-------------------------------------------------------------
+
 void ScreenLogoState::DrawScreen(void)
 {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
+    // Scaling logo for aspect ratio
+    const float screenWidth = static_cast<float>(GetScreenWidth());
+    const float screenHeight = static_cast<float>(GetScreenHeight());
 
-    if (state == 0)         // Draw blinking top-left square corner
-    {
-        if ((framesCounter / 10) % 2) DrawRectangle(logoPositionX, logoPositionY, 16, 16, BLACK);
-    }
-    else if (state == 1)    // Draw bars animation: top and left
-    {
-        DrawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, BLACK);
-        DrawRectangle(logoPositionX, logoPositionY, 16, leftSideRecHeight, BLACK);
-    }
-    else if (state == 2)    // Draw bars animation: bottom and right
-    {
-        DrawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, BLACK);
-        DrawRectangle(logoPositionX, logoPositionY, 16, leftSideRecHeight, BLACK);
+    const float scaleX = screenWidth / static_cast<float>(logo_.width);
+    const float scaleY = screenHeight / static_cast<float>(logo_.height);
 
-        DrawRectangle(logoPositionX + 240, logoPositionY, 16, rightSideRecHeight, BLACK);
-        DrawRectangle(logoPositionX, logoPositionY + 240, bottomSideRecWidth, 16, BLACK);
-    }
-    else if (state == 3)    // Draw "raylib" text-write animation + "powered by"
-    {
-        DrawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, Fade(BLACK, alpha));
-        DrawRectangle(logoPositionX, logoPositionY + 16, 16, leftSideRecHeight - 32, Fade(BLACK, alpha));
+    const float scale = std::min(scaleX, scaleY);
+    const float width = logo_.width * scale;
 
-        DrawRectangle(logoPositionX + 240, logoPositionY + 16, 16, rightSideRecHeight - 32, Fade(BLACK, alpha));
-        DrawRectangle(logoPositionX, logoPositionY + 240, bottomSideRecWidth, 16, Fade(BLACK, alpha));
+    const float height = logo_.height * scale;
 
-        DrawRectangle(GetScreenWidth() / 2 - 112, GetScreenHeight() / 2 - 112, 224, 224, Fade(RAYWHITE, alpha));
+    const float x = (screenWidth - width) / 2.0f;
+    const float y = (screenHeight - height) / 2.0f;
 
-        DrawText(TextSubtext("raylib", 0, lettersCount), GetScreenWidth() / 2 - 44, GetScreenHeight() / 2 + 48, 50, Fade(BLACK, alpha));
-
-        if (framesCounter > 20) DrawText("powered by", logoPositionX, logoPositionY - 27, 20, Fade(DARKGRAY, alpha));
-    }
+    Rectangle srcRect{ 0.0f, 0.0f, static_cast<float>(logo_.width), static_cast<float>(logo_.height) };
+    Rectangle dstRect{ x, y, width, height };
+    DrawTexturePro(logo_, srcRect, dstRect, { 0.0f, 0.0f }, 0.0f, Fade(WHITE, alpha_));
 }
 
 //-------------------------------------------------------------
@@ -131,5 +84,5 @@ void ScreenLogoState::UnloadScreen(void)
 //-------------------------------------------------------------
 int  ScreenLogoState::FinishScreen(void)
 {
-    return finishScreen;
+    return finishScreen_;
 }

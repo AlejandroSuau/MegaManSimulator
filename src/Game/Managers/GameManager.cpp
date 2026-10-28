@@ -32,12 +32,8 @@ GameManager::GameManager()
 
 void GameManager::InitGame()
 {
-
-    // Load global data (assets that must be available in all screens, i.e. font)
-    font = LoadFont("resources/Font/PacManFont.ttf");
-
     // Setup and init first screen
-    ScreenState = &ScreenTitleState::getInstance();
+    ScreenState = &ScreenLogoState::getInstance();
     ScreenState->InitScreen();
      
 }
