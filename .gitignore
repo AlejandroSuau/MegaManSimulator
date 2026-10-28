@@ -1,0 +1,146 @@
+
+# ==========================================
+# C++ / raylib - Windows & macOS
+# Visual Studio 2026 / CMake / Xcode
+# ==========================================
+
+# ------------------------------------------
+# Visual Studio - User settings and cache
+# ------------------------------------------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.rsuser
+*.sln.docstates
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.opendb
+*.VC.VC.opendb
+*.sdf
+*.opensdf
+*.ncb
+*.cachefile
+ipch/
+
+# ------------------------------------------
+# Build directories
+# ------------------------------------------
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+Win32/
+ARM/
+ARM64/
+[Bb]uild/
+build-*/
+cmake-build-*/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+# ------------------------------------------
+# C++ compilation artifacts
+# ------------------------------------------
+*.obj
+*.o
+*.lo
+*.pch
+*.gch
+*.idb
+*.iobj
+*.ipch
+*.ilk
+*.pdb
+*.ipdb
+*.tlog
+*.lastbuildstate
+*.recipe
+*.sbr
+*.log
+
+# ------------------------------------------
+# Generated executables
+# ------------------------------------------
+*.exe
+*.app/
+*.dSYM/
+*.exp
+
+# ------------------------------------------
+# CMake
+# ------------------------------------------
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+install_manifest.txt
+CMakeUserPresets.json
+.ninja_deps
+.ninja_log
+
+# ------------------------------------------
+# Xcode / macOS
+# ------------------------------------------
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.hmap
+
+# ------------------------------------------
+# macOS system files
+# ------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ------------------------------------------
+# Windows system files
+# ------------------------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ------------------------------------------
+# Temporary files
+# ------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+~$*
+
+# ------------------------------------------
+# Dependencies generated locally
+# ------------------------------------------
+vcpkg_installed/
+
+# ------------------------------------------
+# IMPORTANT - Keep these in Git:
+# ------------------------------------------
+# *.cpp / *.h / *.hpp
+# *.sln / *.slnx
+# *.vcxproj / *.vcxproj.filters
+# CMakeLists.txt / CMakePresets.json
+# assets/ (textures, sounds, fonts, shaders)
+# include/ (headers)
+# lib/ (third-party libraries if required)
+# .vsconfig
+#
+# Do not globally ignore *.lib, *.a,
+# *.dll or *.dylib: raylib or other
+# dependencies may require these files.

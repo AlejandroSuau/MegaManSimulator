@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E9C7FDCE-D52A-8D73-7EB0-C5296AF258F6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{21EB8090-0D4E-1035-B6D3-48EBA215DCB7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game Resource Files">
+      <UniqueIdentifier>{BAF00917-2652-E724-AFBF-2DD71B201EE4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows Resource Files">
+      <UniqueIdentifier>{6B659E97-575F-C7E9-40CC-5DFA2C652D56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{8baa4d33-57a9-4aac-b1d5-b207d4c7bc58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{3e147f22-6949-4a1d-b5a5-64f2f3850a75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\States">
+      <UniqueIdentifier>{716d7f47-038c-4566-a703-9d245ba018f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Managers">
+      <UniqueIdentifier>{7e08da40-a00f-48ff-899b-e36e67623554}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\resource_dir.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\Screen.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\ScreenEnding.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\ScreenGameplay.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\ScreenLogo.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\ScreenOptions.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\ScreenTitle.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\StateMachineMngr.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Character.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\GlobalGameDefines.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\MegaMan.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Managers\AudioManager.h">
+      <Filter>Game\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Managers\GameManager.h">
+      <Filter>Game\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Managers\TexturesManager.h">
+      <Filter>Game\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\States\CharacterState.h">
+      <Filter>Game\States</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\States\IdleState.h">
+      <Filter>Game\States</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\MegaMan2.cpp" />
+    <ClCompile Include="src\Menu\Screen.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\ScreenEnding.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\ScreenGameplay.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\ScreenLogo.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\ScreenOptions.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\ScreenTitle.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Character.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\GlobalGameDefines.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\MegaMan.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Managers\AudioManager.cpp">
+      <Filter>Game\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Managers\GameManager.cpp">
+      <Filter>Game\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Managers\TexturesManager.cpp">
+      <Filter>Game\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\States\IdleState.cpp">
+      <Filter>Game\States</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\wabbit_alpha.png">
+      <Filter>Game Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
