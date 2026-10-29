@@ -123,24 +123,11 @@ $RECYCLE.BIN/
 *.swo
 *~
 ~$*
+bitacora.md
 
 # ------------------------------------------
 # Dependencies generated locally
 # ------------------------------------------
 vcpkg_installed/
 
-# ------------------------------------------
-# IMPORTANT - Keep these in Git:
-# ------------------------------------------
-# *.cpp / *.h / *.hpp
-# *.sln / *.slnx
-# *.vcxproj / *.vcxproj.filters
-# CMakeLists.txt / CMakePresets.json
-# assets/ (textures, sounds, fonts, shaders)
-# include/ (headers)
-# lib/ (third-party libraries if required)
-# .vsconfig
-#
-# Do not globally ignore *.lib, *.a,
-# *.dll or *.dylib: raylib or other
-# dependencies may require these files.
+

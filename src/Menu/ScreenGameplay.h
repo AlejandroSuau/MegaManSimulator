@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+#include <array>
+
 class ScreenGameplayState : public StateMachineMngr
 {
 public:
@@ -29,9 +31,10 @@ private:
 	void EvaluateInput(float deltaTime);
 	
 	void DebugOptions();
-	void DrawDebug();
+	void DrawDebug() const;
 
 	Texture2D stageTexture_{};
+	static const std::array<Rectangle, 7> platforms_;
 
 	int framesCounter = 0;
 	int finishScreen = 0;
