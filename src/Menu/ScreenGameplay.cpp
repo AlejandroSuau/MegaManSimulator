@@ -9,7 +9,7 @@
 #include <string>
 #include <algorithm>
 
-const std::array<Rectangle, 7> ScreenGameplayState::platforms_{
+const std::array<Rectangle, 7> ScreenGameplayState::kPlatforms{
 	// Initial floor
 	Rectangle{ 0.0f,    429.0f, 860.0f, 56.0f },
 
@@ -48,12 +48,30 @@ void ScreenGameplayState::InitScreen(void)
 	GameManager::GetGameManager().ResetCamera();
 	stageTexture_ = LoadTexture("resources/Game/Stages/AirManStage_Backup.png");
 
+	player_.InitGameCharacter();
+	const auto& firstPlatform = kPlatforms.front();
+	spawnPosition_ = Vector2{
+		firstPlatform.x + 180.f,
+		firstPlatform.y - player_.GetBounds().height * 0.5f
+	};
+	player_.Reset(spawnPosition_);
 }
 
 void ScreenGameplayState::UpdateScreen(float deltaTime)
 {
-	EvaluateInput(deltaTime);
+	UpdateCamera(deltaTime);
 	DebugOptions();
+
+	player_.UpdateGameCharacter(deltaTime);
+	player_.UpdatePhysics(deltaTime, kPlatforms, static_cast<float>(stageTexture_.width));
+	player_.UpdateAnimation(deltaTime);
+
+	const bool didFallOutside = (player_.GetBounds().y > static_cast<float>(stageTexture_.height));
+	if (didFallOutside || IsKeyPressed(KEY_R)) {
+		player_.Reset(spawnPosition_);
+	}
+
+	UpdateCamera(deltaTime);
 }
 
 void ScreenGameplayState::DrawScreen(void)
@@ -69,6 +87,7 @@ void ScreenGameplayState::DrawScreen(void)
 
 	DrawTexture(stageTexture_, 0, 0, WHITE);
 	DrawDebug();
+	player_.DrawGameCharacter();
 
 	EndMode2D();
 	
@@ -87,6 +106,7 @@ void ScreenGameplayState::DrawScreen(void)
 
 void ScreenGameplayState::UnloadScreen(void)
 {
+	player_.UnloadGameCharacter();
 	UnloadTexture(stageTexture_);
 }
 
@@ -95,32 +115,19 @@ int  ScreenGameplayState::FinishScreen(void)
 	return finishScreen;
 }
 
-void ScreenGameplayState::EvaluateInput(float deltaTime)
+void ScreenGameplayState::UpdateCamera(float deltaTime)
 {
 	// Camera movement
 	Camera2D& camera = GameManager::GetGameManager().GetCamera();
 	
-	float direction = 0.f;
-	if (IsKeyDown(KEY_LEFT))
-	{
-		direction -= 1.f;
-	}
+	const float screenWidth = static_cast<float>(GetScreenWidth());
+	const float stageWidth = static_cast<float>(stageTexture_.width) * camera.zoom;
 
-	if (IsKeyDown(KEY_RIGHT))
-	{
-		direction += 1.f;
-	}
+	const float desiredOffsetX = screenWidth * 0.5f - player_.GetPosition().x * camera.zoom;
+	const float minOffsetX = std::min(0.0f, screenWidth - stageWidth);
 
-	camera.offset.x -= direction * GameGlobalVar::cameraSpeed * deltaTime;
-
-	const float stageWidthOnScreen = static_cast<float>(stageTexture_.width) * camera.zoom;
-	const float minOffsetX = std::min(0.f, static_cast<float>(GetScreenWidth() - stageWidthOnScreen));
-	camera.offset.x = std::clamp(camera.offset.x, minOffsetX, 0.f);
-
-	if (IsKeyPressed(KEY_ENTER))
-	{
-		finishScreen = 4;   // END SCREEN
-	}
+	camera.offset.x = std::clamp(desiredOffsetX, minOffsetX, 0.0f);
+	camera.offset.y = 0.0f;
 }
 
 void ScreenGameplayState::DebugOptions()
@@ -136,9 +143,12 @@ void ScreenGameplayState::DrawDebug() const
 	GameManager& GameInst = GameManager::GetGameManager();
 	if (!debug_floor) { return; }
 
-	for (const auto& platform : platforms_)
+	for (const auto& platform : kPlatforms)
 	{
 		DrawRectangleRec(platform, Fade(GRAY, 0.45f));
 		DrawRectangleLinesEx(platform, 2.0f, LIME);
 	}
+
+	DrawRectangleLinesEx(player_.GetBounds(), 2.0f, RED);
+	DrawCircleV(player_.GetPosition(), 4.0f, RED);
 }

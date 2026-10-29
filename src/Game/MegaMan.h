@@ -1,10 +1,8 @@
-#ifndef MegaMan_CHAR_H
-#define MegaMan_CHAR_H
-
 #pragma once
 
 #include <map>
 #include <string>
+#include <span>
 
 #include "Game/Character.h"
 
@@ -23,28 +21,30 @@ public:
 	// This will get called by the current state
 	virtual void setState(CharacterState& newState);
 
+	Rectangle GetBounds() const;
 
+	bool CanJump() const { return canJump_; }
+	void SetCanJump(bool canJump) { canJump_ = canJump; }
 
-	float GetMegaManJumpSpeed() { return m_MegaManJump_Speed; }
-	float GetMegaManHorzontalSpeed() { return m_MegaMan_Horizontal_Speed; }
-	float GetMegaManVerticalSpeed() { return m_MegaMan_Vertical_Speed; }
-
-	float GetMegaManCurrentSpeed() { return m_Speed; }
-	void  SetMegaManCurrentSpeed(float newSpeed) { m_Speed = newSpeed; }
-
-	bool GetMegaManCanJump() { return m_bcanJump; }
-	void SetMegaManCanJump(bool newCanJump) { m_bcanJump = newCanJump; }
-
+	void Reset(Vector2 position);
+	void UpdatePhysics(
+		float deltaTime,
+		std::span<const Rectangle> platforms,
+		float levelWidth);
+	void UpdateAnimation(float deltaTime);
 
 private:
+	static constexpr float kJumpSpeed = 300.f;
+	static constexpr float kHorizontalSpeed = 200.f;
+	static constexpr float kCollisionWidth = 100.0f;
+	static constexpr float kCollisionHeight = 100.0f;
 
-	const float m_MegaManJump_Speed = 250.f;
-	const float m_MegaMan_Horizontal_Speed = 100.f;
-	const float m_MegaMan_Vertical_Speed = 100.f;
+	float currentVerticalSpeed_ = 0.f;
+	float currentHorizontalSpeed_ = 0.0f;
+	bool canJump_ = false;
 
-	float m_Speed = {0.f};
-	bool m_bcanJump = false;
+	Texture2D idleRightTexture_{};
+	Texture2D idleLeftTexture_{};
 
+	float idleAnimationTime_ = 0.0f;
 };
-
-#endif

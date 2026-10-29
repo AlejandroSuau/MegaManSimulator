@@ -1,12 +1,10 @@
-#ifndef CHARACTER_H
-#define CHARACTER_H
-#endif 
+#pragma once
 
 #include "raylib.h"
+
 #include <map>
 
 class CharacterState;
-#pragma once
 
 enum class CharSpriteDirection
 {
@@ -28,6 +26,8 @@ class GameCharacter
 public :
 	GameCharacter();
 
+	virtual ~GameCharacter() = default;
+
 	virtual void InitGameCharacter();
 	virtual void UpdateGameCharacter(float deltaTime);
 	virtual void DrawGameCharacter();
@@ -40,6 +40,8 @@ public :
 	Rectangle& GetPlayerFrameRec() { return frameRec; }
 	void SetPlayerFrameRec(Rectangle newRec) { frameRec = newRec; }
 
+	Vector2 GetPosition() const { return position_; }
+	void SetPosition(Vector2 position) { position_ = position; }
 
 protected:
 
@@ -48,7 +50,8 @@ protected:
 	std::map<int, FrameRecPos> CharSprites_Idle_Right;
 	std::map<int, FrameRecPos> CharSprites_Idle_Left;
 	std::map<int, FrameRecPos> CharSprites_WalkForward;
-
+	
+	Vector2 position_{};
 
 public:	
 	int framesCounter = 0;
@@ -64,7 +67,7 @@ public:
 
 protected:
 		
-	CharacterState* currentState;
+	CharacterState* currentState = nullptr;
 
 	//Srprite Anim
 	Rectangle frameRec;

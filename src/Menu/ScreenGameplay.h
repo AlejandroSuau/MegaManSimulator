@@ -1,5 +1,7 @@
 #pragma once
+
 #include "StateMachineMngr.h"
+#include "Game/MegaMan.h"
 
 #include "raylib.h"
 
@@ -28,13 +30,16 @@ private:
 	ScreenGameplayState(const ScreenGameplayState& other);
 	ScreenGameplayState& operator= (const ScreenGameplayState& other);
 
-	void EvaluateInput(float deltaTime);
+	void UpdateCamera(float deltaTime);
 	
 	void DebugOptions();
 	void DrawDebug() const;
 
 	Texture2D stageTexture_{};
-	static const std::array<Rectangle, 7> platforms_;
+	static const std::array<Rectangle, 7> kPlatforms;
+
+	MegaMan player_;
+	Vector2 spawnPosition_{};
 
 	int framesCounter = 0;
 	int finishScreen = 0;
