@@ -309,6 +309,8 @@
     <ClInclude Include="src\Game\MegaMan.h" />
     <ClInclude Include="src\Game\States\CharacterState.h" />
     <ClInclude Include="src\Game\States\IdleState.h" />
+    <ClInclude Include="src\Game\States\JumpState.h" />
+    <ClInclude Include="src\Game\States\WalkState.h" />
     <ClInclude Include="src\Menu\Screen.h" />
     <ClInclude Include="src\Menu\ScreenEnding.h" />
     <ClInclude Include="src\Menu\ScreenGameplay.h" />
@@ -325,6 +327,8 @@
     <ClCompile Include="src\Game\Managers\TexturesManager.cpp" />
     <ClCompile Include="src\Game\MegaMan.cpp" />
     <ClCompile Include="src\Game\States\IdleState.cpp" />
+    <ClCompile Include="src\Game\States\JumpState.cpp" />
+    <ClCompile Include="src\Game\States\WalkState.cpp" />
     <ClCompile Include="src\MegaMan2.cpp" />
     <ClCompile Include="src\Menu\Screen.cpp" />
     <ClCompile Include="src\Menu\ScreenEnding.cpp" />

@@ -2,9 +2,11 @@
 #pragma once
 
 #include "ScreenGameplay.h"
-#include "raylib.h"
 #include "Game/Managers/GameManager.h"
 #include "Game/GlobalGameDefines.h"
+#include "Game/States/CharacterState.h"
+
+#include "raylib.h"
 
 #include <string>
 #include <algorithm>
@@ -59,7 +61,6 @@ void ScreenGameplayState::InitScreen(void)
 
 void ScreenGameplayState::UpdateScreen(float deltaTime)
 {
-	UpdateCamera(deltaTime);
 	DebugOptions();
 
 	player_.UpdateGameCharacter(deltaTime);
@@ -69,6 +70,9 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 	const bool didFallOutside = (player_.GetBounds().y > static_cast<float>(stageTexture_.height));
 	if (didFallOutside || IsKeyPressed(KEY_R)) {
 		player_.Reset(spawnPosition_);
+	} else {
+		player_.updateState();
+		player_.UpdateAnimation(deltaTime);
 	}
 
 	UpdateCamera(deltaTime);
@@ -86,8 +90,8 @@ void ScreenGameplayState::DrawScreen(void)
 	BeginMode2D(camera);
 
 	DrawTexture(stageTexture_, 0, 0, WHITE);
-	DrawDebug();
 	player_.DrawGameCharacter();
+	DrawDebug();
 
 	EndMode2D();
 	
@@ -101,6 +105,16 @@ void ScreenGameplayState::DrawScreen(void)
 	{
 		const auto mouseWorld = GetScreenToWorld2D(GetMousePosition(), camera);
 		DrawText(TextFormat("Mundo: X %.0f | Y %.0f", mouseWorld.x, mouseWorld.y), 20, 20, 20, YELLOW);
+	
+		const auto* state = player_.getCurrentState();
+
+		DrawText(
+			TextFormat(
+				"Estado: %s",
+				state != nullptr ? state->GetName() : "None"
+			),
+			20, 48, 20, YELLOW
+		);
 	}
 }
 

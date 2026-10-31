@@ -72,6 +72,12 @@
     <ClInclude Include="src\Game\States\IdleState.h">
       <Filter>Game\States</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\States\JumpState.h">
+      <Filter>Game\States</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\States\WalkState.h">
+      <Filter>Game\States</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\MegaMan2.cpp" />
@@ -112,6 +118,12 @@
       <Filter>Game\Managers</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\States\IdleState.cpp">
+      <Filter>Game\States</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\States\JumpState.cpp">
+      <Filter>Game\States</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\States\WalkState.cpp">
       <Filter>Game\States</Filter>
     </ClCompile>
   </ItemGroup>

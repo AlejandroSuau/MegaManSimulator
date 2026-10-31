@@ -7,13 +7,19 @@ class GameCharacter;
 class IdleState : public CharacterState
 {
 public:
-	void enter(GameCharacter* character);
 	void updateState(GameCharacter* character);
-	void exit(GameCharacter* character) {}
+
+	CharSpriteDirection GetSpriteState(bool isFacingLeft) const override
+	{
+		return isFacingLeft ? CharSpriteDirection::State_IdleLeft : CharSpriteDirection::State_IdleRight;
+	}
+
+	const char* GetName() const override { return "Idle"; }
+
 	static CharacterState& getInstance();
 
 private:
-	IdleState() {}
-	IdleState(const IdleState& other);
-	IdleState& operator=(const IdleState& other);
+	IdleState() = default;
+	IdleState(const IdleState& other) = delete;
+	IdleState& operator=(const IdleState& other) = delete;
 };

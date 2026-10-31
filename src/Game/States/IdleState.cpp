@@ -1,25 +1,15 @@
 #include "IdleState.h"
 
-
-void IdleState::enter(GameCharacter* character) 
-{
-	//character->SetCharSpriteState(CharSpriteDirection::State_Idle);
-}
+#include "WalkState.h"
+#include "JumpState.h"
 
 void IdleState::updateState(GameCharacter* character)
 {
-	// if (IsKeyPressed(KEY_LEFT))
-	// {
-		// character->setState(WalkForwardState::getInstance());
-
-	// }
-	// else if (IsKeyPressed(KEY_RIGHT))
-	// {
-		// character->setState(WalkBackwardsState::getInstance());
-	// }
-
-	// add more states
-
+    if (!character->IsGrounded()) {
+        character->setState(JumpState::getInstance());
+    } else if (character->IsMoving()) {
+        character->setState(WalkState::getInstance());
+    }
 }
 
 CharacterState& IdleState::getInstance()

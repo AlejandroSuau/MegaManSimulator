@@ -35,6 +35,8 @@ void GameCharacter::UnloadGameCharacter()
 // State Machines
 void GameCharacter::setState(CharacterState& newState)
 {
+	if (currentState == &newState) { return; }
+
 	currentState->exit(this);  // do something before we change state
 	currentState = &newState;  // change state
 	currentState->enter(this); // do something after we change state

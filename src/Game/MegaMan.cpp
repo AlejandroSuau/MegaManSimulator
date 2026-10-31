@@ -9,42 +9,68 @@
 #include <string>             // String manipulation functions: strrchr(), strcmp()
 #include <algorithm>
 #include <cmath>
+#include <initializer_list>
 
 #include "raylib.h"
 
 
 void MegaMan::InitGameCharacter()
 {
+    GameCharacter::InitGameCharacter();
 
-	//Let's fill the vector MegaManSprtes Data
-    idleRightTexture_ = LoadTexture("resources/Game/MegaMan/IdleRight.png");
-    idleLeftTexture_ = LoadTexture("resources/Game/MegaMan/IdleLeft.png");
-	
-    CharSprites_Counter.clear();
-    CharSprites_Idle_Right.clear();
-    CharSprites_Idle_Left.clear();
+    // Create a little lambda as helper for load the animations
+    const auto loadAnimation = [this](
+        CharSpriteDirection sprite,
+        const char* path,
+        float width,
+        float height,
+        std::initializer_list<float> durations) {
 
-    CharSprites_Counter[CharSpriteDirection::State_IdleRight] = 2;
-    CharSprites_Counter[CharSpriteDirection::State_IdleLeft] = 2;
+            auto& animation = animations_[sprite];
+            animation.texture = LoadTexture(path);
+            int index = 0;
+            for (auto duration : durations) {
+                animation.frames.push_back(
+                    FrameRecPos{
+                    { index * width, 0.f, width, height },
+                    { width * 0.5f, height },
+                    duration});
+                
+                ++index;
+            }
+    };
 
-    for (int i = 0; i < 2; ++i)
-    {
-        const FrameRecPos frame{
-            { static_cast<float>(i) * 100.0f, 0.0f, 100.0f, 100.0f },
-            { 50.0f, 100.0f }
-        };
+    loadAnimation(
+        CharSpriteDirection::State_IdleLeft,
+        "resources/Game/MegaMan/IdleLeft.png",
+        100.f, 100.f, {1.8f, 0.12f});
 
-        CharSprites_Idle_Right[i] = frame;
-        CharSprites_Idle_Left[i] = frame;
-    }
+    loadAnimation(
+        CharSpriteDirection::State_IdleRight,
+        "resources/Game/MegaMan/IdleRight.png",
+        100.f, 100.f, { 1.8f, 0.12f });
 
-    idleAnimationTime_ = 0.0f;
+    loadAnimation(
+        CharSpriteDirection::State_WalkRight,
+        "resources/Game/MegaMan/WalkRight.png",
+        150.0f, 100.0f, { 0.125f, 0.125f, 0.125f });
 
-    SetCharSpriteState(CharSpriteDirection::State_IdleRight);
-    SetPlayerFrameRec(CharSprites_Idle_Right.at(0).frameRec);
+    loadAnimation(
+        CharSpriteDirection::State_WalkLeft,
+        "resources/Game/MegaMan/WalkLeft.png",
+        150.0f, 100.0f, { 0.125f, 0.125f, 0.125f });
 
-    currentState = &IdleState::getInstance();
-    currentState->enter(this);
+    loadAnimation(
+        CharSpriteDirection::State_JumpRight,
+        "resources/Game/MegaMan/JumpRight.png",
+        150.0f, 150.0f, { 0.1f });
+
+    loadAnimation(
+        CharSpriteDirection::State_JumpLeft,
+        "resources/Game/MegaMan/JumpLeft.png",
+        150.0f, 150.0f, { 0.1f });
+
+    Reset({ 0.0f, 0.0f });
 }
 
 Rectangle MegaMan::GetBounds() const
@@ -59,52 +85,42 @@ Rectangle MegaMan::GetBounds() const
 
 void MegaMan::Reset(Vector2 position)
 {
-	SetPosition(position);
+    SetPosition(position);
 
     currentVerticalSpeed_ = 0.0f;
     currentHorizontalSpeed_ = 0.0f;
     canJump_ = false;
-
-    SetCharSpriteState(CharSpriteDirection::State_IdleRight);
+    isFacingLeft_ = false;
 
     currentFrame = 0;
-    idleAnimationTime_ = 0.0f;
+    animationTime_ = 0.0f;
 
-    SetPlayerFrameRec(CharSprites_Idle_Right.at(0).frameRec);
+    setState(IdleState::getInstance());
+    SetCharSpriteState(CharSpriteDirection::State_IdleRight);
+
+    SetPlayerFrameRec(
+        animations_.at(GetCharSpriteState()).frames.front().frameRec);
 }
 
 void MegaMan::UpdateGameCharacter(float /*deltaTime*/)
 {
-	updateState();
-
     currentHorizontalSpeed_ = 0.0f;
 
-	if (IsKeyDown(KEY_LEFT))
-	{
+    if (IsKeyDown(KEY_LEFT)) {
         currentHorizontalSpeed_ -= kHorizontalSpeed;
-	}
+    }
 
-	if (IsKeyDown(KEY_RIGHT))
-	{
+    if (IsKeyDown(KEY_RIGHT)) {
         currentHorizontalSpeed_ += kHorizontalSpeed;
-	}
+    }
 
-	if (IsKeyPressed(KEY_SPACE) && canJump_)
-	{
+    if (currentHorizontalSpeed_ != 0.0f) {
+        isFacingLeft_ = currentHorizontalSpeed_ < 0.0f;
+    }
+
+    if (IsKeyPressed(KEY_SPACE) && canJump_) {
         currentVerticalSpeed_ = -kJumpSpeed;
         canJump_ = false;
-	}
-
-    // Update player sprite. Only if is moving (so we c an preserv last side state)
-    const auto nextSprite = (currentHorizontalSpeed_ < 0.0f)
-        ? CharSpriteDirection::State_IdleLeft
-        : CharSpriteDirection::State_IdleRight;
-    if (currentHorizontalSpeed_ != 0.f && nextSprite != GetCharSpriteState())
-    {
-        SetCharSpriteState(nextSprite);
-
-        currentFrame = 0;
-        idleAnimationTime_ = 0.0f;
     }
 }
 
@@ -159,58 +175,60 @@ void MegaMan::UpdatePhysics(
 
 void MegaMan::UpdateAnimation(float deltaTime)
 {
-    // Frame 0: open eyes. Frame 1: closed eyes.
-    constexpr float frameDurations[] = { 1.8f, 0.12f };
-    const bool isResting = canJump_ && currentHorizontalSpeed_ == 0.0f;
+    const auto nextSprite = currentState->GetSpriteState(isFacingLeft_);
+    if (nextSprite != GetCharSpriteState()) {
+        SetCharSpriteState(nextSprite);
 
-    if (!isResting) {
         currentFrame = 0;
-        idleAnimationTime_ = 0.0f;
-    } else {
-        idleAnimationTime_ += deltaTime;
+        animationTime_ = 0.0f;
+    }
 
-        const int frameCount = CharSprites_Counter.at(GetCharSpriteState());
-        while (idleAnimationTime_ >= frameDurations[currentFrame])
-        {
-            idleAnimationTime_ -= frameDurations[currentFrame];
+    const auto& animation = animations_.at(GetCharSpriteState());
+    const int frameCount = static_cast<int>(animation.frames.size());
+    if (frameCount > 1) {
+        animationTime_ += deltaTime;
+
+        // Advance multiple frames if needed to keep animation in sync with elapsed time.
+        while (animationTime_ >= animation.frames.at(currentFrame).durationInSeconds) {
+            animationTime_ -= animation.frames.at(currentFrame).durationInSeconds;
+
             currentFrame = (currentFrame + 1) % frameCount;
         }
     }
 
-    const auto& frames = GetCharSpriteState() == CharSpriteDirection::State_IdleLeft
-        ? CharSprites_Idle_Left
-        : CharSprites_Idle_Right;
-
-    SetPlayerFrameRec(frames.at(currentFrame).frameRec);
+    SetPlayerFrameRec(animation.frames.at(currentFrame).frameRec);
 }
 
 void MegaMan::DrawGameCharacter()
 {
-    const bool isFacingLeft = GetCharSpriteState() == CharSpriteDirection::State_IdleLeft;
-    const auto& texture = isFacingLeft ? idleLeftTexture_ : idleRightTexture_;
+    const auto& animation = animations_.at(GetCharSpriteState());
+    const auto& frame = animation.frames.at(currentFrame);
 
-    const auto& frames = isFacingLeft ? CharSprites_Idle_Left : CharSprites_Idle_Right;
-    const auto& frame = frames.at(currentFrame);
     const Rectangle destination{
-        position_.x,
-        position_.y + kCollisionHeight * 0.5f,
-        frame.frameRec.width,
-        frame.frameRec.height
+       position_.x,
+       position_.y + kCollisionHeight * 0.5f,
+       frame.frameRec.width,
+       frame.frameRec.height
     };
 
-    DrawTexturePro(texture,frame.frameRec, destination, frame.frameOrigin, 0.0f, WHITE);
+    DrawTexturePro(animation.texture, frame.frameRec, destination, frame.frameOrigin, 0.0f, WHITE);
 }
 
 void MegaMan::UnloadGameCharacter()
 {
-    UnloadTexture(idleRightTexture_);
-    UnloadTexture(idleLeftTexture_);
+    for (auto& [sprite, animation] : animations_) {
+        UnloadTexture(animation.texture);
+    }
 }
 
 // State Machines
 void MegaMan::setState(CharacterState& newState)
 {
-	currentState->exit(this);  // do something before we change state
+    if (currentState) {
+        // do something before we change state
+        currentState->exit(this);
+    }
+
 	currentState = &newState;  // change state
 	currentState->enter(this); // do something after we change state
 }

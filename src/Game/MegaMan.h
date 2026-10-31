@@ -1,11 +1,11 @@
 #pragma once
 
-#include <map>
-#include <string>
-#include <span>
-
 #include "Game/Character.h"
 
+#include <vector>
+#include <string>
+#include <span>
+#include <map>
 
 class MegaMan : public GameCharacter
 {
@@ -21,6 +21,9 @@ public:
 	// This will get called by the current state
 	virtual void setState(CharacterState& newState);
 
+	bool IsGrounded() const override { return canJump_; }
+	bool IsMoving() const override { return currentHorizontalSpeed_ != 0.f;  }
+
 	Rectangle GetBounds() const;
 
 	bool CanJump() const { return canJump_; }
@@ -34,6 +37,12 @@ public:
 	void UpdateAnimation(float deltaTime);
 
 private:
+	struct AnimationClip
+	{
+		Texture2D texture{};
+		std::vector<FrameRecPos> frames;
+	};
+
 	static constexpr float kJumpSpeed = 300.f;
 	static constexpr float kHorizontalSpeed = 200.f;
 	static constexpr float kCollisionWidth = 100.0f;
@@ -43,8 +52,8 @@ private:
 	float currentHorizontalSpeed_ = 0.0f;
 	bool canJump_ = false;
 
-	Texture2D idleRightTexture_{};
-	Texture2D idleLeftTexture_{};
+	std::map<CharSpriteDirection, AnimationClip> animations_;
 
-	float idleAnimationTime_ = 0.0f;
+	float animationTime_ = 0.0f;
+	bool isFacingLeft_ = false;
 };
