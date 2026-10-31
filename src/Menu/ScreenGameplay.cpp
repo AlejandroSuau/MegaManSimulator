@@ -65,12 +65,12 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 
 	player_.UpdateGameCharacter(deltaTime);
 	player_.UpdatePhysics(deltaTime, kPlatforms, static_cast<float>(stageTexture_.width));
-	player_.UpdateAnimation(deltaTime);
 
 	const bool didFallOutside = (player_.GetBounds().y > static_cast<float>(stageTexture_.height));
 	if (didFallOutside || IsKeyPressed(KEY_R)) {
 		player_.Reset(spawnPosition_);
 	} else {
+		player_.UpdateShooting(deltaTime);
 		player_.updateState();
 		player_.UpdateAnimation(deltaTime);
 	}

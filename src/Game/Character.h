@@ -11,7 +11,15 @@ enum class CharSpriteDirection
 	State_WalkRight,
 	State_WalkLeft,
 	State_JumpRight,
-	State_JumpLeft
+	State_JumpLeft,
+
+	// Shooting
+	State_IdleShootRight,
+	State_IdleShootLeft,
+	State_WalkShootRight,
+	State_WalkShootLeft,
+	State_JumpShootRight,
+	State_JumpShootLeft
 };
 
 struct FrameRecPos

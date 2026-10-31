@@ -16,7 +16,9 @@ public:
 
 	virtual void updateState(GameCharacter* character) = 0;
 
-	virtual CharSpriteDirection GetSpriteState(bool isFacingLeft) const = 0;
+	virtual CharSpriteDirection GetSpriteState(
+		bool isFacingLeft,
+		bool isShooting) const = 0;
 	virtual const char* GetName() const = 0;
 };
 

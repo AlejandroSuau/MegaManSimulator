@@ -9,10 +9,9 @@ class JumpState : public CharacterState
 public:
 	void updateState(GameCharacter* character);
 
-	CharSpriteDirection GetSpriteState(bool isFacingLeft) const override
-	{
-		return isFacingLeft ? CharSpriteDirection::State_JumpLeft : CharSpriteDirection::State_JumpRight;
-	}
+	CharSpriteDirection GetSpriteState(
+		bool isFacingLeft,
+		bool isShooting) const override;
 
 	const char* GetName() const override { return "Jump"; }
 

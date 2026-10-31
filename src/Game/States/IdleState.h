@@ -9,10 +9,9 @@ class IdleState : public CharacterState
 public:
 	void updateState(GameCharacter* character);
 
-	CharSpriteDirection GetSpriteState(bool isFacingLeft) const override
-	{
-		return isFacingLeft ? CharSpriteDirection::State_IdleLeft : CharSpriteDirection::State_IdleRight;
-	}
+	CharSpriteDirection GetSpriteState(
+		bool isFacingLeft,
+		bool isShooting) const override;
 
 	const char* GetName() const override { return "Idle"; }
 

@@ -40,6 +40,7 @@ void MegaMan::InitGameCharacter()
             }
     };
 
+    // Movement
     loadAnimation(
         CharSpriteDirection::State_IdleLeft,
         "resources/Game/MegaMan/IdleLeft.png",
@@ -70,6 +71,41 @@ void MegaMan::InitGameCharacter()
         "resources/Game/MegaMan/JumpLeft.png",
         150.0f, 150.0f, { 0.1f });
 
+    // Shooting
+
+    loadAnimation(
+        CharSpriteDirection::State_IdleShootRight,
+        "resources/Game/MegaMan/IdleRight_Shoot.png",
+        150.f, 100.f, { 0.1f });
+
+    loadAnimation(
+        CharSpriteDirection::State_IdleShootLeft,
+        "resources/Game/MegaMan/IdleLeft_Shoot.png",
+        150.f, 100.f, { 0.1f });
+
+    loadAnimation(
+        CharSpriteDirection::State_WalkShootRight,
+        "resources/Game/MegaMan/WalkRight_Shoot.png",
+        150.f, 100.f, { 0.125f, 0.125f, 0.125f });
+
+    loadAnimation(
+        CharSpriteDirection::State_WalkShootLeft,
+        "resources/Game/MegaMan/WalkLeft_Shoot.png",
+        150.f, 100.f, { 0.125f, 0.125f, 0.125f });
+
+    loadAnimation(
+        CharSpriteDirection::State_JumpShootRight,
+        "resources/Game/MegaMan/JumpRight_Shoot.png",
+        150.f, 150.f, { 0.1f });
+
+    loadAnimation(
+        CharSpriteDirection::State_JumpShootLeft,
+        "resources/Game/MegaMan/JumpLeft_Shoot.png",
+        150.f, 150.f, { 0.1f });
+
+    projectileTexture_ = LoadTexture(
+        "resources/Game/MegaMan/Projectile.png");
+
     Reset({ 0.0f, 0.0f });
 }
 
@@ -86,6 +122,10 @@ Rectangle MegaMan::GetBounds() const
 void MegaMan::Reset(Vector2 position)
 {
     SetPosition(position);
+
+    projectiles_.clear();
+    shotCooldown_ = 0.f;
+    shootingPoseTime_ = 0.f;
 
     currentVerticalSpeed_ = 0.0f;
     currentHorizontalSpeed_ = 0.0f;
@@ -175,7 +215,8 @@ void MegaMan::UpdatePhysics(
 
 void MegaMan::UpdateAnimation(float deltaTime)
 {
-    const auto nextSprite = currentState->GetSpriteState(isFacingLeft_);
+    const auto nextSprite = currentState->GetSpriteState(
+        isFacingLeft_, shootingPoseTime_ > 0.f);
     if (nextSprite != GetCharSpriteState()) {
         SetCharSpriteState(nextSprite);
 
@@ -199,6 +240,43 @@ void MegaMan::UpdateAnimation(float deltaTime)
     SetPlayerFrameRec(animation.frames.at(currentFrame).frameRec);
 }
 
+void MegaMan::UpdateShooting(float deltaTime)
+{
+    shotCooldown_ = std::max(0.f, shotCooldown_ - deltaTime);
+    shootingPoseTime_ = std::max(0.f, shootingPoseTime_ - deltaTime);
+
+    // Update alive projectiles
+    for (auto& projectile : projectiles_) {
+        projectile.position.x += projectile.velocityX * deltaTime;
+        projectile.lifeTimeInSeconds += deltaTime;
+    }
+
+    // Remove all which expired lifetime
+    std::erase_if(projectiles_, [](const Projectile& projectile) {
+        return projectile.lifeTimeInSeconds >= kProjectileLifetime; });
+
+    if (!IsKeyDown(KEY_Z) || shotCooldown_ > 0.f) {
+        return;
+    }
+
+    const float direction = isFacingLeft_ ? -1.f : 1.f;
+
+    // Gun height depends on sprite
+    const float feetY = position_.y + kCollisionHeight * 0.5f;
+    const float muzzleHeight = canJump_ ? 55.f : 105.f;
+
+    projectiles_.push_back(Projectile{
+        {
+            position_.x + direction * (75.f + kProjectileRadius),
+            feetY - muzzleHeight
+        },
+        direction * kProjectileSpeed,
+        0.f});
+
+    shotCooldown_ = kShotInterval;
+    shootingPoseTime_ = kShootingPoseDuration;
+}
+
 void MegaMan::DrawGameCharacter()
 {
     const auto& animation = animations_.at(GetCharSpriteState());
@@ -212,6 +290,31 @@ void MegaMan::DrawGameCharacter()
     };
 
     DrawTexturePro(animation.texture, frame.frameRec, destination, frame.frameOrigin, 0.0f, WHITE);
+    
+    // Projectiles
+    const Rectangle source{
+        0.f,
+        0.f,
+       static_cast<float>(projectileTexture_.width),
+       static_cast<float>(projectileTexture_.height)
+    };
+
+    for (const auto& projectile : projectiles_) {
+        const Rectangle destination{
+            projectile.position.x,
+            projectile.position.y,
+            kProjectileRadius * 2.f,
+            kProjectileRadius * 2.f
+        };
+
+        DrawTexturePro(
+            projectileTexture_,
+            source,
+            destination,
+            { kProjectileRadius, kProjectileRadius },
+            0.f,
+            WHITE);
+    }
 }
 
 void MegaMan::UnloadGameCharacter()
@@ -219,6 +322,8 @@ void MegaMan::UnloadGameCharacter()
     for (auto& [sprite, animation] : animations_) {
         UnloadTexture(animation.texture);
     }
+
+    UnloadTexture(projectileTexture_);
 }
 
 // State Machines
