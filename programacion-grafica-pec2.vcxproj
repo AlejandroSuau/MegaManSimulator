@@ -303,6 +303,7 @@
   <ItemGroup>
     <ClInclude Include="src\Game\Character.h" />
     <ClInclude Include="src\Game\Enemies\Copipi.h" />
+    <ClInclude Include="src\Game\Enemies\Lift.h" />
     <ClInclude Include="src\Game\GlobalGameDefines.h" />
     <ClInclude Include="src\Game\Managers\AudioManager.h" />
     <ClInclude Include="src\Game\Managers\GameManager.h" />
@@ -323,6 +324,7 @@
   <ItemGroup>
     <ClCompile Include="src\Game\Character.cpp" />
     <ClCompile Include="src\Game\Enemies\Copipi.cpp" />
+    <ClCompile Include="src\Game\Enemies\Lift.cpp" />
     <ClCompile Include="src\Game\GlobalGameDefines.cpp" />
     <ClCompile Include="src\Game\Managers\AudioManager.cpp" />
     <ClCompile Include="src\Game\Managers\GameManager.cpp" />

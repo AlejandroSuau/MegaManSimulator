@@ -84,6 +84,9 @@
     <ClInclude Include="src\Game\Enemies\Copipi.h">
       <Filter>Game\Enemies</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Enemies\Lift.h">
+      <Filter>Game\Enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\MegaMan2.cpp" />
@@ -133,6 +136,9 @@
       <Filter>Game\States</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Enemies\Copipi.cpp">
+      <Filter>Game\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Enemies\Lift.cpp">
       <Filter>Game\Enemies</Filter>
     </ClCompile>
   </ItemGroup>

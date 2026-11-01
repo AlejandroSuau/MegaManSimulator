@@ -10,6 +10,7 @@
 
 #include <string>
 #include <algorithm>
+#include <cmath>
 
 const std::array<Rectangle, 7> ScreenGameplayState::kPlatforms{
 	// Initial floor
@@ -52,13 +53,12 @@ ScreenGameplayState& ScreenGameplayState::getInstance()
 
 void ScreenGameplayState::InitScreen(void)
 {
-	framesCounter = 0;
 	finishScreen = 0;
 
 	GameManager::GetGameManager().ResetCamera();
 	stageTexture_ = LoadTexture("resources/Game/Stages/AirManStage_Backup.png");
 
-
+	// Player
 	player_.InitGameCharacter();
 	playerLives_ = kinitialPlayerLives;
 	const auto& firstPlatform = kPlatforms.front();
@@ -68,10 +68,17 @@ void ScreenGameplayState::InitScreen(void)
 	};
 	player_.Reset(spawnPosition_);
 
+	// Enemies
 	copipiTexture_ = LoadTexture("resources/Game/Enemies/Copipi.png");
 	for (std::size_t i = 0; i < enemies_.size(); ++i) {
 		enemies_[i].Init(kCopipiSpawns[i], copipiTexture_);
 	}
+
+	// Lifts
+	liftTexture_ = LoadTexture("resources/Game/Enemies/Lift.png");
+	lifts_[0].Init(3900.f, 4500.f, 322.f, false, liftTexture_);
+	lifts_[1].Init(4600.f, 5200.f, 600.f, true,  liftTexture_);
+	lifts_[2].Init(5300.f, 5900.f, 322.f, false, liftTexture_);
 }
 
 void ScreenGameplayState::UpdateScreen(float deltaTime)
@@ -79,7 +86,17 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 	DebugOptions();
 
 	player_.UpdateGameCharacter(deltaTime);
-	player_.UpdatePhysics(deltaTime, kPlatforms, static_cast<float>(stageTexture_.width));
+
+	UpdateLifts(deltaTime);
+
+	// Group together all platforms so we can process their collision together
+	std::array<Rectangle, kPlatforms.size() + lifts_.size()> collisionPlatforms;
+	std::copy(kPlatforms.begin(), kPlatforms.end(), collisionPlatforms.begin());
+	for (std::size_t i = 0; i < lifts_.size(); ++i) {
+		collisionPlatforms[kPlatforms.size() + i] = lifts_[i].GetBounds();
+	}
+
+	player_.UpdatePhysics(deltaTime, collisionPlatforms, static_cast<float>(stageTexture_.width));
 
 	// Check if player felt
 	const bool didFallOutside = (player_.GetBounds().y > static_cast<float>(stageTexture_.height));
@@ -131,6 +148,10 @@ void ScreenGameplayState::DrawScreen(void)
 
 	DrawTexture(stageTexture_, 0, 0, WHITE);
 	
+	for (auto& lift : lifts_) {
+		lift.DrawGameCharacter();
+	}
+
 	for (auto& enemy : enemies_) {
 		enemy.DrawGameCharacter();
 	}
@@ -144,16 +165,13 @@ void ScreenGameplayState::DrawScreen(void)
 		TextFormat("Vidas: %d", playerLives_),
 		20, 80, 24, WHITE);
 
-	if (debug_floor)
+	if (isDrawingDebug_)
 	{
 		const auto mouseWorld = GetScreenToWorld2D(GetMousePosition(), camera);
 		DrawText(TextFormat("Mundo: X %.0f | Y %.0f", mouseWorld.x, mouseWorld.y), 20, 20, 20, YELLOW);
 	
 		const auto* state = player_.getCurrentState();
-
-		DrawText(
-			TextFormat("Estado: %s", state ? state->GetName() : "None"),
-			20, 48, 20, YELLOW);
+		DrawText(TextFormat("Estado: %s", state ? state->GetName() : "None"), 20, 48, 20, YELLOW);
 	}
 }
 
@@ -162,6 +180,7 @@ void ScreenGameplayState::UnloadScreen(void)
 	player_.UnloadGameCharacter();
 	UnloadTexture(stageTexture_);
 	UnloadTexture(copipiTexture_);
+	UnloadTexture(liftTexture_);
 }
 
 int  ScreenGameplayState::FinishScreen(void)
@@ -188,14 +207,14 @@ void ScreenGameplayState::DebugOptions()
 {
 	if (IsKeyPressed(KEY_O))
 	{
-		debug_floor = !debug_floor;
+		isDrawingDebug_ = !isDrawingDebug_;
 	}
 }
 
 void ScreenGameplayState::DrawDebug() const
 {
 	GameManager& GameInst = GameManager::GetGameManager();
-	if (!debug_floor) { return; }
+	if (!isDrawingDebug_) { return; }
 
 	for (const auto& platform : kPlatforms)
 	{
@@ -219,6 +238,13 @@ void ScreenGameplayState::DrawDebug() const
 			20,
 			YELLOW);
 	}
+
+	for (const auto& lift : lifts_) {
+		const Rectangle bounds = lift.GetBounds();
+
+		DrawRectangleRec(bounds, Fade(SKYBLUE, 0.35f));
+		DrawRectangleLinesEx(bounds, 2.f, BLUE);
+	}
 }
 
 void ScreenGameplayState::RespawnPlayer()
@@ -229,6 +255,10 @@ void ScreenGameplayState::RespawnPlayer()
 		if (enemy.IsAlive()) {
 			enemy.ResetPosition();
 		}
+	}
+
+	for (auto& lift : lifts_) {
+		lift.Reset();
 	}
 
 	UpdateCamera(0.f);
@@ -245,4 +275,32 @@ void ScreenGameplayState::LoseLife()
 	}
 
 	RespawnPlayer();
+}
+
+void ScreenGameplayState::UpdateLifts(float deltaTime)
+{
+	const auto playerBounds = player_.GetBounds();
+	const float playerBottom = playerBounds.y + playerBounds.height;
+
+	bool carried = false;
+	for (auto& lift : lifts_) {
+		// Check previous lift position
+		const Rectangle previousBounds = lift.GetBounds();
+
+		lift.UpdateGameCharacter(deltaTime);
+
+		const bool isOverlappingX =
+			playerBounds.x + playerBounds.width > previousBounds.x &&
+			playerBounds.x < previousBounds.x + previousBounds.width;
+
+		const bool isOnTop = std::abs(playerBottom - previousBounds.y) < 0.01f;
+
+		if (!carried && player_.IsGrounded() && isOverlappingX && isOnTop) {
+			auto position = player_.GetPosition();
+			position.x += lift.GetDisplacementX();
+
+			player_.SetPosition(position);
+			carried = true;
+		}
+	}
 }

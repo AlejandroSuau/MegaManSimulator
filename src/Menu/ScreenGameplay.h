@@ -3,6 +3,7 @@
 #include "StateMachineMngr.h"
 #include "Game/MegaMan.h"
 #include "Game/Enemies/Copipi.h"
+#include "Game/Enemies/Lift.h"
 
 #include "raylib.h"
 
@@ -34,6 +35,8 @@ private:
 	Texture2D stageTexture_{};
 	static const std::array<Rectangle, 7> kPlatforms;
 
+	static constexpr int kinitialPlayerLives = 3;
+	int playerLives_ = kinitialPlayerLives;
 	MegaMan player_;
 	Vector2 spawnPosition_{};
 	
@@ -41,14 +44,11 @@ private:
 	std::array<Copipi, 5> enemies_{};
 	Texture2D copipiTexture_{};
 
-	static constexpr int kinitialPlayerLives = 3;
-	int playerLives_ = kinitialPlayerLives;
-	int framesCounter = 0;
-	int finishScreen = 0;
-	bool mb_ReplayLevel = false;
+	std::array<Lift, 3> lifts_{};
+	Texture2D liftTexture_{};
 
-	bool debug_floor = false;
-	bool debug_stairs = false;
+	int finishScreen = 0;
+	bool isDrawingDebug_ = false;
 
 	void UpdateCamera(float deltaTime);
 
@@ -57,4 +57,5 @@ private:
 
 	void RespawnPlayer();
 	void LoseLife();
+	void UpdateLifts(float deltaTime);
 };
