@@ -79,6 +79,17 @@ void ScreenGameplayState::InitScreen(void)
 	lifts_[0].Init(3900.f, 4500.f, 322.f, false, liftTexture_);
 	lifts_[1].Init(4600.f, 5200.f, 600.f, true,  liftTexture_);
 	lifts_[2].Init(5300.f, 5900.f, 322.f, false, liftTexture_);
+
+	// Dragons
+	redDragonTexture_ = LoadTexture("resources/Game/Enemies/RedDemon.png");
+	blueDragonTexture_ = LoadTexture("resources/Game/Enemies/BlueDemon.png");
+	hornTexture_ = LoadTexture("resources/Game/Enemies/DragonHorn.png");
+
+	dragons_[0].Init(1100.f, 340.f, 430.f, false, redDragonTexture_, hornTexture_);
+	dragons_[1].Init(1690.f, 390.f, 480.f, true,  blueDragonTexture_, hornTexture_);
+	dragons_[2].Init(2230.f, 220.f, 310.f, false, redDragonTexture_, hornTexture_);
+	dragons_[3].Init(2820.f, 320.f, 410.f, true,  blueDragonTexture_, hornTexture_);
+	dragons_[4].Init(3360.f, 320.f, 410.f, false, redDragonTexture_, hornTexture_);
 }
 
 void ScreenGameplayState::UpdateScreen(float deltaTime)
@@ -87,15 +98,10 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 
 	player_.UpdateGameCharacter(deltaTime);
 
-	UpdateLifts(deltaTime);
-
 	// Group together all platforms so we can process their collision together
-	std::array<Rectangle, kPlatforms.size() + lifts_.size()> collisionPlatforms;
-	std::copy(kPlatforms.begin(), kPlatforms.end(), collisionPlatforms.begin());
-	for (std::size_t i = 0; i < lifts_.size(); ++i) {
-		collisionPlatforms[kPlatforms.size() + i] = lifts_[i].GetBounds();
-	}
-
+	// 7 static + 3 lift + 5 dragons
+	std::array<PlatformCollision, 7 + 3 + 5> collisionPlatforms{};
+	UpdatePlatforms(deltaTime, collisionPlatforms);
 	player_.UpdatePhysics(deltaTime, collisionPlatforms, static_cast<float>(stageTexture_.width));
 
 	// Check if player felt
@@ -103,6 +109,16 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 	if (didFallOutside) {
 		LoseLife();
 		return;
+	}
+
+	// Check dragon horns
+	for (auto& dragon : dragons_) {
+		dragon.UpdateHorns(player_.GetPosition());
+
+		if (dragon.TouchesHorns(player_.GetBounds())) {
+			LoseLife();
+			return;
+		}
 	}
 
 	// Try to activate enemies
@@ -137,7 +153,6 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 
 void ScreenGameplayState::DrawScreen(void)
 {
-
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
 
 	GameManager& GameInst = GameManager::GetGameManager();
@@ -154,6 +169,10 @@ void ScreenGameplayState::DrawScreen(void)
 
 	for (auto& enemy : enemies_) {
 		enemy.DrawGameCharacter();
+	}
+
+	for (auto& dragon : dragons_) {
+		dragon.DrawGameCharacter();
 	}
 
 	player_.DrawGameCharacter();
@@ -181,6 +200,9 @@ void ScreenGameplayState::UnloadScreen(void)
 	UnloadTexture(stageTexture_);
 	UnloadTexture(copipiTexture_);
 	UnloadTexture(liftTexture_);
+	UnloadTexture(redDragonTexture_);
+	UnloadTexture(blueDragonTexture_);
+	UnloadTexture(hornTexture_);
 }
 
 int  ScreenGameplayState::FinishScreen(void)
@@ -245,11 +267,26 @@ void ScreenGameplayState::DrawDebug() const
 		DrawRectangleRec(bounds, Fade(SKYBLUE, 0.35f));
 		DrawRectangleLinesEx(bounds, 2.f, BLUE);
 	}
+
+	for (const auto& dragon : dragons_) {
+		DrawRectangleLinesEx(dragon.GetBounds(), 2.f, GREEN);
+
+		if (dragon.AreHornsVisible()) {
+			for (const auto& horn : dragon.GetHornBounds()) {
+				DrawRectangleRec(horn, Fade(RED, 0.25f));
+				DrawRectangleLinesEx(horn, 2.f, RED);
+			}
+		}
+	}
 }
 
 void ScreenGameplayState::RespawnPlayer()
 {
 	player_.Reset(spawnPosition_);
+
+	for (auto& dragon : dragons_) {
+		dragon.Reset();
+	}
 
 	for (auto& enemy : enemies_) {
 		if (enemy.IsAlive()) {
@@ -277,30 +314,31 @@ void ScreenGameplayState::LoseLife()
 	RespawnPlayer();
 }
 
-void ScreenGameplayState::UpdateLifts(float deltaTime)
+void ScreenGameplayState::UpdatePlatforms(
+	float deltaTime,
+	std::span<PlatformCollision> platforms)
 {
-	const auto playerBounds = player_.GetBounds();
-	const float playerBottom = playerBounds.y + playerBounds.height;
+	std::size_t index = 0;
+	for (const auto& bounds : kPlatforms) {
+		platforms[index++] = PlatformCollision {bounds, {0.f, 0.f} };
+	}
 
-	bool carried = false;
+	// Little lambda helper for update each platform and set its collision
+	const auto appendMoving = [&](auto& platform) {
+		const auto previous = platform.GetBounds();
+		platform.UpdateGameCharacter(deltaTime);
+
+		const auto current = platform.GetBounds();
+		platforms[index++] = PlatformCollision {
+			current, { current.x - previous.x, current.y - previous.y }
+		};
+	};
+
 	for (auto& lift : lifts_) {
-		// Check previous lift position
-		const Rectangle previousBounds = lift.GetBounds();
+		appendMoving(lift);
+	}
 
-		lift.UpdateGameCharacter(deltaTime);
-
-		const bool isOverlappingX =
-			playerBounds.x + playerBounds.width > previousBounds.x &&
-			playerBounds.x < previousBounds.x + previousBounds.width;
-
-		const bool isOnTop = std::abs(playerBottom - previousBounds.y) < 0.01f;
-
-		if (!carried && player_.IsGrounded() && isOverlappingX && isOnTop) {
-			auto position = player_.GetPosition();
-			position.x += lift.GetDisplacementX();
-
-			player_.SetPosition(position);
-			carried = true;
-		}
+	for (auto& dragon : dragons_) {
+		appendMoving(dragon);
 	}
 }

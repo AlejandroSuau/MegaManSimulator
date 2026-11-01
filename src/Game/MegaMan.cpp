@@ -168,14 +168,36 @@ void MegaMan::UpdateGameCharacter(float /*deltaTime*/)
 
 void MegaMan::UpdatePhysics(
     float deltaTime, 
-    std::span<const Rectangle> platforms,
+    std::span<const PlatformCollision> platforms,
     float levelWidth)
 {
     const float halfWidth = kCollisionWidth * 0.5f;
     const float halfHeight = kCollisionHeight * 0.5f;
     const float maxLevelX = std::max(halfWidth, levelWidth - halfWidth);
 
-    const float previousBottom = position_.y + halfHeight;
+    const float supportTolerance = 0.01f;
+    
+    const Rectangle previousBounds = GetBounds();
+    const float previousBottom = previousBounds.y + previousBounds.height;
+
+    // Transport in the platform we stay.
+    if (canJump_) {
+        for (const auto& platform : platforms) {
+            const float oldX = platform.bounds.x - platform.displacement.x;
+            const float oldY = platform.bounds.y - platform.displacement.y;
+
+            const bool doesOverlapX =
+                previousBounds.x + previousBounds.width > oldX &&
+                previousBounds.x < oldX + platform.bounds.width;
+
+            const bool isOnTop = std::abs(previousBottom - oldY) < supportTolerance;
+            if (doesOverlapX && isOnTop) {
+                position_.x += platform.displacement.x;
+                position_.y += platform.displacement.y;
+                break;
+            }
+        }
+    }
 
     // Movement from input
     position_.x += currentHorizontalSpeed_ * deltaTime;
@@ -192,17 +214,19 @@ void MegaMan::UpdatePhysics(
     float landingY = currentBottom;
 
     for (const auto& platform : platforms) {
+        const auto surface = platform.bounds;
+        const float previousTop = surface.y - platform.displacement.y;
+
         const bool doesOverlapX =
-            bounds.x + bounds.width > platform.x &&
-            bounds.x < platform.x + platform.width;
+            bounds.x + bounds.width > surface.x &&
+            bounds.x < surface.x + surface.width;
 
         const bool doesCrossTop =
-            previousBottom <= platform.y &&
-            currentBottom >= platform.y;
+            previousBottom <= previousTop + supportTolerance &&
+            currentBottom >= surface.y;
 
-        if (currentVerticalSpeed_ >= 0.0f &&
-            doesOverlapX && doesCrossTop) {
-            landingY = std::min(landingY, platform.y);
+        if (currentVerticalSpeed_ >= 0.0f && doesOverlapX && doesCrossTop) {
+            landingY = std::min(landingY, surface.y);
             isLanded = true;
         }
     }

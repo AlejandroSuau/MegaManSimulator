@@ -303,12 +303,14 @@
   <ItemGroup>
     <ClInclude Include="src\Game\Character.h" />
     <ClInclude Include="src\Game\Enemies\Copipi.h" />
+    <ClInclude Include="src\Game\Enemies\Dragon.h" />
     <ClInclude Include="src\Game\Enemies\Lift.h" />
     <ClInclude Include="src\Game\GlobalGameDefines.h" />
     <ClInclude Include="src\Game\Managers\AudioManager.h" />
     <ClInclude Include="src\Game\Managers\GameManager.h" />
     <ClInclude Include="src\Game\Managers\TexturesManager.h" />
     <ClInclude Include="src\Game\MegaMan.h" />
+    <ClInclude Include="src\Game\PlatformCollision.h" />
     <ClInclude Include="src\Game\States\CharacterState.h" />
     <ClInclude Include="src\Game\States\IdleState.h" />
     <ClInclude Include="src\Game\States\JumpState.h" />
@@ -324,12 +326,14 @@
   <ItemGroup>
     <ClCompile Include="src\Game\Character.cpp" />
     <ClCompile Include="src\Game\Enemies\Copipi.cpp" />
+    <ClCompile Include="src\Game\Enemies\Dragon.cpp" />
     <ClCompile Include="src\Game\Enemies\Lift.cpp" />
     <ClCompile Include="src\Game\GlobalGameDefines.cpp" />
     <ClCompile Include="src\Game\Managers\AudioManager.cpp" />
     <ClCompile Include="src\Game\Managers\GameManager.cpp" />
     <ClCompile Include="src\Game\Managers\TexturesManager.cpp" />
     <ClCompile Include="src\Game\MegaMan.cpp" />
+    <ClCompile Include="src\Game\PlatformCollision.cpp" />
     <ClCompile Include="src\Game\States\IdleState.cpp" />
     <ClCompile Include="src\Game\States\JumpState.cpp" />
     <ClCompile Include="src\Game\States\WalkState.cpp" />

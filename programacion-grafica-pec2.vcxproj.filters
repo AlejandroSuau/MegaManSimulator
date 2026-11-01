@@ -87,6 +87,12 @@
     <ClInclude Include="src\Game\Enemies\Lift.h">
       <Filter>Game\Enemies</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\PlatformCollision.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Enemies\Dragon.h">
+      <Filter>Game\Enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\MegaMan2.cpp" />
@@ -139,6 +145,12 @@
       <Filter>Game\Enemies</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Enemies\Lift.cpp">
+      <Filter>Game\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\PlatformCollision.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Enemies\Dragon.cpp">
       <Filter>Game\Enemies</Filter>
     </ClCompile>
   </ItemGroup>

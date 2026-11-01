@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/Character.h"
+#include "Game/PlatformCollision.h"
 
 #include <vector>
 #include <string>
@@ -32,7 +33,7 @@ public:
 	void Reset(Vector2 position);
 	void UpdatePhysics(
 		float deltaTime,
-		std::span<const Rectangle> platforms,
+		std::span<const PlatformCollision> platforms,
 		float levelWidth);
 	void UpdateAnimation(float deltaTime);
 	void UpdateShooting(float deltaTime);
@@ -54,7 +55,7 @@ private:
 	};
 
 	// Shooting
-	static constexpr float kShotInterval = 1.f;
+	static constexpr float kShotInterval = 0.5f;
 	static constexpr float kProjectileLifetime = 3.f;
 	static constexpr float kProjectileSpeed = 600.f;
 	static constexpr float kShootingPoseDuration = 0.2f;

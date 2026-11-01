@@ -4,6 +4,7 @@
 #include "Game/MegaMan.h"
 #include "Game/Enemies/Copipi.h"
 #include "Game/Enemies/Lift.h"
+#include "Game/Enemies/Dragon.h"
 
 #include "raylib.h"
 
@@ -47,6 +48,11 @@ private:
 	std::array<Lift, 3> lifts_{};
 	Texture2D liftTexture_{};
 
+	std::array<Dragon, 5> dragons_{};
+	Texture2D redDragonTexture_{};
+	Texture2D blueDragonTexture_{};
+	Texture2D hornTexture_{};
+
 	int finishScreen = 0;
 	bool isDrawingDebug_ = false;
 
@@ -57,5 +63,5 @@ private:
 
 	void RespawnPlayer();
 	void LoseLife();
-	void UpdateLifts(float deltaTime);
+	void UpdatePlatforms(float deltaTime, std::span<PlatformCollision> platforms);
 };
