@@ -25,6 +25,9 @@
     <Filter Include="Game\Managers">
       <UniqueIdentifier>{7e08da40-a00f-48ff-899b-e36e67623554}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Enemies">
+      <UniqueIdentifier>{6dab1614-6514-4efb-94bf-ab5a9a409304}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Menu\Screen.h">
@@ -78,6 +81,9 @@
     <ClInclude Include="src\Game\States\WalkState.h">
       <Filter>Game\States</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Enemies\Copipi.h">
+      <Filter>Game\Enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\MegaMan2.cpp" />
@@ -125,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="src\Game\States\WalkState.cpp">
       <Filter>Game\States</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Enemies\Copipi.cpp">
+      <Filter>Game\Enemies</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -37,6 +37,8 @@ public:
 	void UpdateAnimation(float deltaTime);
 	void UpdateShooting(float deltaTime);
 
+	bool ConsumeProjectileHit(Rectangle target);
+
 private:
 	struct AnimationClip
 	{
@@ -59,7 +61,7 @@ private:
 	static constexpr float kProjectileRadius = 15.f;
 
 	// Movement
-	static constexpr float kJumpSpeed = 300.f;
+	static constexpr float kJumpSpeed = 500.f;
 	static constexpr float kHorizontalSpeed = 200.f;
 	static constexpr float kCollisionWidth = 100.0f;
 	static constexpr float kCollisionHeight = 100.0f;

@@ -2,6 +2,7 @@
 
 #include "StateMachineMngr.h"
 #include "Game/MegaMan.h"
+#include "Game/Enemies/Copipi.h"
 
 #include "raylib.h"
 
@@ -30,17 +31,18 @@ private:
 	ScreenGameplayState(const ScreenGameplayState& other);
 	ScreenGameplayState& operator= (const ScreenGameplayState& other);
 
-	void UpdateCamera(float deltaTime);
-	
-	void DebugOptions();
-	void DrawDebug() const;
-
 	Texture2D stageTexture_{};
 	static const std::array<Rectangle, 7> kPlatforms;
 
 	MegaMan player_;
 	Vector2 spawnPosition_{};
+	
+	static const std::array<Vector2, 5> kCopipiSpawns;
+	std::array<Copipi, 5> enemies_{};
+	Texture2D copipiTexture_{};
 
+	static constexpr int kinitialPlayerLives = 3;
+	int playerLives_ = kinitialPlayerLives;
 	int framesCounter = 0;
 	int finishScreen = 0;
 	bool mb_ReplayLevel = false;
@@ -48,4 +50,11 @@ private:
 	bool debug_floor = false;
 	bool debug_stairs = false;
 
+	void UpdateCamera(float deltaTime);
+
+	void DebugOptions();
+	void DrawDebug() const;
+
+	void RespawnPlayer();
+	void LoseLife();
 };

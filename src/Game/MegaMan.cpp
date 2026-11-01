@@ -18,6 +18,8 @@ void MegaMan::InitGameCharacter()
 {
     GameCharacter::InitGameCharacter();
 
+    UnloadGameCharacter();
+
     // Create a little lambda as helper for load the animations
     const auto loadAnimation = [this](
         CharSpriteDirection sprite,
@@ -317,13 +319,35 @@ void MegaMan::DrawGameCharacter()
     }
 }
 
+bool MegaMan::ConsumeProjectileHit(Rectangle target)
+{
+    const auto hit = std::find_if(
+        projectiles_.begin(),
+        projectiles_.end(),
+        [target](const Projectile& projectile) {
+            return CheckCollisionCircleRec(
+                projectile.position,
+                kProjectileRadius,
+                target);
+        });
+
+    if (hit == projectiles_.end()) {
+        return false;
+    }
+
+    projectiles_.erase(hit);
+    return true;
+}
+
 void MegaMan::UnloadGameCharacter()
 {
     for (auto& [sprite, animation] : animations_) {
         UnloadTexture(animation.texture);
     }
+    animations_.clear();
 
     UnloadTexture(projectileTexture_);
+    projectiles_.clear();
 }
 
 // State Machines

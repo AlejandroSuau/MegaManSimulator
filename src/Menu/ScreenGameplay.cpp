@@ -31,6 +31,14 @@ const std::array<Rectangle, 7> ScreenGameplayState::kPlatforms{
 	}
 };
 
+const std::array<Vector2, 5> ScreenGameplayState::kCopipiSpawns{
+	Vector2{750.f, 374.f},
+	Vector2{1600.f, 267.f},
+	Vector2{2850.f, 267.f},
+	Vector2{3550.f, 267.f},
+	Vector2{6500.f, 374.f}
+};
+
 ScreenGameplayState::ScreenGameplayState()
 {
 
@@ -50,13 +58,20 @@ void ScreenGameplayState::InitScreen(void)
 	GameManager::GetGameManager().ResetCamera();
 	stageTexture_ = LoadTexture("resources/Game/Stages/AirManStage_Backup.png");
 
+
 	player_.InitGameCharacter();
+	playerLives_ = kinitialPlayerLives;
 	const auto& firstPlatform = kPlatforms.front();
 	spawnPosition_ = Vector2{
 		firstPlatform.x + 180.f,
 		firstPlatform.y - player_.GetBounds().height * 0.5f
 	};
 	player_.Reset(spawnPosition_);
+
+	copipiTexture_ = LoadTexture("resources/Game/Enemies/Copipi.png");
+	for (std::size_t i = 0; i < enemies_.size(); ++i) {
+		enemies_[i].Init(kCopipiSpawns[i], copipiTexture_);
+	}
 }
 
 void ScreenGameplayState::UpdateScreen(float deltaTime)
@@ -66,14 +81,39 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 	player_.UpdateGameCharacter(deltaTime);
 	player_.UpdatePhysics(deltaTime, kPlatforms, static_cast<float>(stageTexture_.width));
 
+	// Check if player felt
 	const bool didFallOutside = (player_.GetBounds().y > static_cast<float>(stageTexture_.height));
-	if (didFallOutside || IsKeyPressed(KEY_R)) {
-		player_.Reset(spawnPosition_);
-	} else {
-		player_.UpdateShooting(deltaTime);
-		player_.updateState();
-		player_.UpdateAnimation(deltaTime);
+	if (didFallOutside) {
+		LoseLife();
+		return;
 	}
+
+	// Try to activate enemies
+	for (auto& enemy : enemies_) {
+		enemy.TryActivate(player_.GetPosition());
+		enemy.UpdateGameCharacter(deltaTime);
+	}
+
+	player_.UpdateShooting(deltaTime);
+
+	// ChecK if an enemy got hit
+	for (auto& enemy : enemies_) {
+		if (enemy.IsAlive() && player_.ConsumeProjectileHit(enemy.GetBounds())) {
+			enemy.TakeHit();
+		}
+	}
+
+	// Check if enemy died
+	for (auto& enemy : enemies_) {
+		if (enemy.IsAlive() && CheckCollisionRecs(player_.GetBounds(), enemy.GetBounds())) {
+			enemy.Kill();
+			LoseLife();
+			return;
+		}
+	}
+
+	player_.updateState();
+	player_.UpdateAnimation(deltaTime);
 
 	UpdateCamera(deltaTime);
 }
@@ -90,16 +130,19 @@ void ScreenGameplayState::DrawScreen(void)
 	BeginMode2D(camera);
 
 	DrawTexture(stageTexture_, 0, 0, WHITE);
+	
+	for (auto& enemy : enemies_) {
+		enemy.DrawGameCharacter();
+	}
+
 	player_.DrawGameCharacter();
 	DrawDebug();
 
 	EndMode2D();
-	
-	// UI Score, lives
 
-	//Font font = GameInst.GetFont();
-	//DrawText("SCORE:", 300.f, 100.f, 25, WHITE);
-	//DrawText(to_string(GameInst.GetScore()).c_str(), 440.f, 100.f, 25, WHITE);
+	DrawText(
+		TextFormat("Vidas: %d", playerLives_),
+		20, 80, 24, WHITE);
 
 	if (debug_floor)
 	{
@@ -109,12 +152,8 @@ void ScreenGameplayState::DrawScreen(void)
 		const auto* state = player_.getCurrentState();
 
 		DrawText(
-			TextFormat(
-				"Estado: %s",
-				state != nullptr ? state->GetName() : "None"
-			),
-			20, 48, 20, YELLOW
-		);
+			TextFormat("Estado: %s", state ? state->GetName() : "None"),
+			20, 48, 20, YELLOW);
 	}
 }
 
@@ -122,6 +161,7 @@ void ScreenGameplayState::UnloadScreen(void)
 {
 	player_.UnloadGameCharacter();
 	UnloadTexture(stageTexture_);
+	UnloadTexture(copipiTexture_);
 }
 
 int  ScreenGameplayState::FinishScreen(void)
@@ -165,4 +205,44 @@ void ScreenGameplayState::DrawDebug() const
 
 	DrawRectangleLinesEx(player_.GetBounds(), 2.0f, RED);
 	DrawCircleV(player_.GetPosition(), 4.0f, RED);
+
+	for (const auto& enemy : enemies_) {
+		if (!enemy.IsAlive()) { continue; }
+
+		const auto bounds = enemy.GetBounds();
+
+		DrawRectangleLinesEx(bounds, 2.f, ORANGE);
+		DrawText(
+			TextFormat("HP: %d", enemy.GetHealth()),
+			static_cast<int>(bounds.x),
+			static_cast<int>(bounds.y - 22.f),
+			20,
+			YELLOW);
+	}
+}
+
+void ScreenGameplayState::RespawnPlayer()
+{
+	player_.Reset(spawnPosition_);
+
+	for (auto& enemy : enemies_) {
+		if (enemy.IsAlive()) {
+			enemy.ResetPosition();
+		}
+	}
+
+	UpdateCamera(0.f);
+}
+
+void ScreenGameplayState::LoseLife()
+{
+	if (playerLives_ <= 0) { return; }
+
+	--playerLives_;
+	if (playerLives_ == 0) {
+		finishScreen = 4;
+		return;
+	}
+
+	RespawnPlayer();
 }
