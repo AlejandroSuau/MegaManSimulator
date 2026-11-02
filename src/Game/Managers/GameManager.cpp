@@ -181,6 +181,8 @@ void GameManager::ChangeToScreen(int screen)
 // Request transition to next screen
 void GameManager::TransitionToScreen(int screen)
 {
+    ScreenState->UnloadScreen();
+
     onTransition = true;
     transFadeOut = false;
     transToScreen = screen;
@@ -199,8 +201,6 @@ void GameManager::UpdateTransition(void)
         if (transAlpha > 1.01f)
         {
             transAlpha = 1.0f;
-            // Unload current screen
-            ScreenState->UnloadScreen();
 
             // Init next screen
             ScreenState->InitScreen();

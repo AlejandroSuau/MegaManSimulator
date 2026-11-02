@@ -62,10 +62,10 @@ private:
 	static constexpr float kProjectileRadius = 15.f;
 
 	// Movement
-	static constexpr float kJumpSpeed = 500.f;
+	static constexpr float kJumpSpeed = 360.f;
 	static constexpr float kHorizontalSpeed = 200.f;
-	static constexpr float kCollisionWidth = 100.0f;
-	static constexpr float kCollisionHeight = 100.0f;
+	static constexpr float kCollisionWidth = 80.0f;
+	static constexpr float kCollisionHeight = 80.0f;
 
 	std::vector<Projectile> projectiles_;
 	Texture2D projectileTexture_{};

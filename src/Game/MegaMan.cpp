@@ -105,8 +105,7 @@ void MegaMan::InitGameCharacter()
         "resources/Game/MegaMan/JumpLeft_Shoot.png",
         150.f, 150.f, { 0.1f });
 
-    projectileTexture_ = LoadTexture(
-        "resources/Game/MegaMan/Projectile.png");
+    projectileTexture_ = LoadTexture("resources/Game/MegaMan/Projectile.png");
 
     Reset({ 0.0f, 0.0f });
 }

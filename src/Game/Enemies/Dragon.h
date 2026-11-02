@@ -38,7 +38,7 @@ private:
     static constexpr float kSurfaceInset = 8.f;
 
     static constexpr float kSpeed = 60.f;
-    static constexpr float kHornSize = 60.f;
+    static constexpr float kHornSize = 50.f;
 
     Texture2D bodyTexture_{};
     Texture2D hornTexture_{};

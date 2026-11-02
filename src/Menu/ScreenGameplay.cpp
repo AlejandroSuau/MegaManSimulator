@@ -77,7 +77,7 @@ void ScreenGameplayState::InitScreen(void)
 	// Lifts
 	liftTexture_ = LoadTexture("resources/Game/Enemies/Lift.png");
 	lifts_[0].Init(3900.f, 4500.f, 322.f, false, liftTexture_);
-	lifts_[1].Init(4600.f, 5200.f, 600.f, true,  liftTexture_);
+	lifts_[1].Init(4600.f, 5200.f, 480.f, true,  liftTexture_);
 	lifts_[2].Init(5300.f, 5900.f, 322.f, false, liftTexture_);
 
 	// Dragons
@@ -85,11 +85,15 @@ void ScreenGameplayState::InitScreen(void)
 	blueDragonTexture_ = LoadTexture("resources/Game/Enemies/BlueDemon.png");
 	hornTexture_ = LoadTexture("resources/Game/Enemies/DragonHorn.png");
 
-	dragons_[0].Init(1100.f, 340.f, 430.f, false, redDragonTexture_, hornTexture_);
+	dragons_[0].Init(1100.f, 340.f, 480.f, false, redDragonTexture_, hornTexture_);
 	dragons_[1].Init(1690.f, 390.f, 480.f, true,  blueDragonTexture_, hornTexture_);
 	dragons_[2].Init(2230.f, 220.f, 310.f, false, redDragonTexture_, hornTexture_);
 	dragons_[3].Init(2820.f, 320.f, 410.f, true,  blueDragonTexture_, hornTexture_);
 	dragons_[4].Init(3360.f, 320.f, 410.f, false, redDragonTexture_, hornTexture_);
+
+	// HUD
+	playerIconTexture_ = LoadTexture("resources/UI/MegaManIcon.png");
+	livesMultiplierTexture_ = LoadTexture("resources/UI/guiX.png");
 }
 
 void ScreenGameplayState::UpdateScreen(float deltaTime)
@@ -180,9 +184,7 @@ void ScreenGameplayState::DrawScreen(void)
 
 	EndMode2D();
 
-	DrawText(
-		TextFormat("Vidas: %d", playerLives_),
-		20, 80, 24, WHITE);
+	DrawHUD();
 
 	if (isDrawingDebug_)
 	{
@@ -197,9 +199,14 @@ void ScreenGameplayState::DrawScreen(void)
 void ScreenGameplayState::UnloadScreen(void)
 {
 	player_.UnloadGameCharacter();
+	UnloadTexture(playerIconTexture_);
+	UnloadTexture(livesMultiplierTexture_);
+
 	UnloadTexture(stageTexture_);
+
 	UnloadTexture(copipiTexture_);
 	UnloadTexture(liftTexture_);
+
 	UnloadTexture(redDragonTexture_);
 	UnloadTexture(blueDragonTexture_);
 	UnloadTexture(hornTexture_);
@@ -341,4 +348,22 @@ void ScreenGameplayState::UpdatePlatforms(
 	for (auto& dragon : dragons_) {
 		appendMoving(dragon);
 	}
+}
+
+void ScreenGameplayState::DrawHUD() const
+{
+	const float margin = 50.f;
+
+	const float x = margin;
+	const float y = margin;
+
+	DrawTextureV(playerIconTexture_, { x, y + 16.f }, WHITE);
+	DrawTextureV(livesMultiplierTexture_, { x + 100, y + 48.f }, WHITE);
+	
+	DrawText(
+		TextFormat("%d", playerLives_),
+		static_cast<int>(x + 175),
+		static_cast<int>(y + 46.f),
+		30,
+		WHITE);
 }

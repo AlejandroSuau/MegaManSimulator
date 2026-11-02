@@ -53,15 +53,20 @@ private:
 	Texture2D blueDragonTexture_{};
 	Texture2D hornTexture_{};
 
+	Texture2D playerIconTexture_{};
+	Texture2D livesMultiplierTexture_{};
+
 	int finishScreen = 0;
 	bool isDrawingDebug_ = false;
 
 	void UpdateCamera(float deltaTime);
+	void UpdatePlatforms(float deltaTime, std::span<PlatformCollision> platforms);
 
 	void DebugOptions();
 	void DrawDebug() const;
 
 	void RespawnPlayer();
 	void LoseLife();
-	void UpdatePlatforms(float deltaTime, std::span<PlatformCollision> platforms);
+	
+	void DrawHUD() const;
 };
