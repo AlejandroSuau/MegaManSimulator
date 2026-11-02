@@ -54,8 +54,11 @@ ScreenGameplayState& ScreenGameplayState::getInstance()
 void ScreenGameplayState::InitScreen(void)
 {
 	finishScreen = 0;
+	
+	auto& gameManager = GameManager::GetGameManager();
+	gameManager.SetGameResult(GameResult::Playing);
+	gameManager.ResetCamera();
 
-	GameManager::GetGameManager().ResetCamera();
 	stageTexture_ = LoadTexture("resources/Game/Stages/AirManStage_Backup.png");
 
 	// Player
@@ -147,6 +150,16 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 			LoseLife();
 			return;
 		}
+	}
+
+	// Check if win
+	const auto playerBounds = player_.GetBounds();
+	const float levelWidth = static_cast<float>(stageTexture_.width);
+	const bool reachedEnd = playerBounds.x + playerBounds.width >= levelWidth - 0.5f;
+
+	if (reachedEnd) {
+		FinishGame(GameResult::Won);
+		return;
 	}
 
 	player_.updateState();
@@ -314,7 +327,7 @@ void ScreenGameplayState::LoseLife()
 
 	--playerLives_;
 	if (playerLives_ == 0) {
-		finishScreen = 4;
+		FinishGame(GameResult::Lost);
 		return;
 	}
 
@@ -366,4 +379,12 @@ void ScreenGameplayState::DrawHUD() const
 		static_cast<int>(y + 46.f),
 		30,
 		WHITE);
+}
+
+void ScreenGameplayState::FinishGame(GameResult result)
+{
+	if (finishScreen != 0) { return; }
+
+	GameManager::GetGameManager().SetGameResult(result);
+	finishScreen = 4;
 }

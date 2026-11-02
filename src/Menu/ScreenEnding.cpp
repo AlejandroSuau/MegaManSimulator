@@ -36,17 +36,22 @@ void ScreenEndingState::DrawScreen(void)
 {
 	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
 	GameManager& GameInst = GameManager::GetGameManager();
+	const bool won = GameInst.GetGameResult() == GameResult::Won;
 
-	Font font = GameInst.GetFont();
+	Font font = GetFontDefault();
 
-	// Write this in case of win
-	DrawTextEx(font, "GAME OVER", Vector2{ (GetScreenWidth() / 2.f) - 150, (GetScreenHeight() / 2.f) -150 }, font.baseSize * 2.0f, 1, RED);
+	// Lambda helper for drawing center
+	const auto drawCentered = [&](const char* text, float y, float size, Color color) {
+		const auto measured = MeasureTextEx(font, text, size, 2.f);
+		const float x = (GetScreenWidth() - measured.x) * 0.5f;
+		DrawTextEx(font, text, {x, y}, size, 2.f, color);
+	};
 
-	DrawTextEx(font, "YOU WIN!", Vector2{ (GetScreenWidth() / 2.f) - 150, (GetScreenHeight() / 2.f) - 150 }, font.baseSize * 2.0f, 1, WHITE);
+	const float centerY = GetScreenHeight() * 0.5f;
 
-	DrawText("Press Enter for Playing", (GetScreenWidth() / 2.f) - (MeasureText("Press Enter for Playing", 25) / 2), (GetScreenHeight() / 2.f) + 50, 25, WHITE);
-	DrawText("Press 'O' for Options", (GetScreenWidth() / 2.f) - (MeasureText("Press 'I' for Instructions", 25) / 2), (GetScreenHeight() / 2.f) + 100, 25, WHITE);
-
+	drawCentered(won ? "YOU WIN!" : "GAME OVER", centerY - 140.f, 56.f, won ? GREEN : RED);
+	drawCentered("Press Enter for Playing", centerY + 35.f, 24.f, WHITE);
+	drawCentered("Press 'O' for Options", centerY + 115.f, 24.f, WHITE);
 }
 
 void ScreenEndingState::UnloadScreen(void)

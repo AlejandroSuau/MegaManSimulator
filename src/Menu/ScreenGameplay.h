@@ -5,6 +5,7 @@
 #include "Game/Enemies/Copipi.h"
 #include "Game/Enemies/Lift.h"
 #include "Game/Enemies/Dragon.h"
+#include "Game/Managers/GameManager.h"
 
 #include "raylib.h"
 
@@ -69,4 +70,5 @@ private:
 	void LoseLife();
 	
 	void DrawHUD() const;
+	void FinishGame(GameResult result);
 };

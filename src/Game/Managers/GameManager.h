@@ -14,12 +14,15 @@ enum Level
 	End = 3,
 };
 
+enum class GameResult
+{
+	Playing,
+	Won,
+	Lost
+};
 
 class GameManager
 {
-private:
-
-
 public:
 	GameManager();
 
@@ -40,6 +43,9 @@ public:
 
 	void IncreaseScore(int newValue) { score += newValue; }
 	void DecreaseScore(int newValue) { score -= newValue; }
+
+	GameResult GetGameResult() const { return gameResult_; }
+	void SetGameResult(GameResult result) { gameResult_ = result; }
 
 	//Maps Progression
 	void MapsForwardProgression();
@@ -71,8 +77,7 @@ private:
 	int seconds = 0;
 
 	Level NumLevel = Level::Title;
-
-private:
+	GameResult gameResult_ = GameResult::Playing;
 
 	static GameManager *GameMngr;
 
