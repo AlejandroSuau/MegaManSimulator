@@ -1,6 +1,11 @@
 #include "ScreenOptions.h"
+
+#include "Game/Managers/GameManager.h"
+
 #include "raylib.h"
 
+#include <algorithm>
+#include <array>
 
 ScreenOptionsState::ScreenOptionsState()
 {
@@ -17,6 +22,8 @@ void ScreenOptionsState::InitScreen(void)
 {
 	framesCounter = 0;
 	finishScreen = 0;
+
+    GameManager::GetGameManager().GetAudio().PlayMusic(MusicTrack::Title);
 }
 
 void ScreenOptionsState::UpdateScreen(float deltaTime)
@@ -31,23 +38,36 @@ void ScreenOptionsState::DrawScreen(void)
 {
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
 
-    const char* line1 = "To move PACMAN use the direction keys or A,D,W,S.";
-    const char* line2 = "PACMAN has 3 lifes, every dot eaten increases 10 points";
-    const char* line3 = "the big dots adds 50 points to the score.";
-    const char* line4 = "To win PACMAN has to eat all the dots";
-    const char* line5 = "You loose if the ghost SHADOW kills you 3 times.";
-    
+    const Font font = GetFontDefault();
+    const auto drawCentered = [&](const char* text, float y, float size, Color color) {
+        const auto measured = MeasureTextEx(font, text, size, 1);
+        DrawTextEx(font, text, { (GetScreenWidth() - measured.x) * 0.5f, y }, size, 1, color);
+    };
 
-    DrawText(line1, (GetScreenWidth() / 2) - (MeasureText(line1, 20) / 2.), 150, 20, WHITE);
-    DrawText(line2, (GetScreenWidth() / 2) - (MeasureText(line2, 20) / 2.), 180, 20, WHITE);
-    DrawText(line3, (GetScreenWidth() / 2) - (MeasureText(line3, 20) / 2.), 210, 20, WHITE);
-    DrawText(line4, (GetScreenWidth() / 2) - (MeasureText(line4, 20) / 2.), 240, 20, WHITE);
-    DrawText(line5, (GetScreenWidth() / 2) - (MeasureText(line5, 20) / 2.), 270, 20, WHITE);
+    const float centerY = GetScreenHeight() * 0.5f;
 
-    const char* line7 = "Press 'O' to return to Title.";
+    constexpr std::array lines{
+        "LEFT / RIGHT - Move.",
+        "SPACE - Jump while standing on a platform.",
+        "Hold Z - Shoot once. Shots last up to 3 seconds.",
+        "Reach the right end of the level and land to win.",
+        "You start with 3 lives. Losing all of them ends the game.",
+        "You lose a life by falling, touching Copipi or hitting dragon horns.",
+        "Copipi takes 3 hits. Touching it also removes the enemy.",
+        "Platforms can be crossed from below.",
+        "Moving platforms carry you while you stand on them.",
+        "Dragon horns are dangerous. Land between them.",
+        "O during gameplay - Toggle collision debug.",
+    };
 
-    DrawText(line7, (GetScreenWidth() / 2.f) - (MeasureText(line7, 20) / 2.), 380, 20, WHITE);
+    float y = centerY - 240.f;
 
+    for (const char* line : lines) {
+        drawCentered(line, y, 22.f, WHITE);
+        y += 36.f;
+    }
+
+    drawCentered("Press O to return to Title.", GetScreenHeight() - 60.f, 24.f, YELLOW);
 }
 
 void ScreenOptionsState::UnloadScreen(void)

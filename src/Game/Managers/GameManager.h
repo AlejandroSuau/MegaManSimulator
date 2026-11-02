@@ -1,8 +1,10 @@
 #pragma once
 
-#include "raylib.h"
 
 #include "Menu/StateMachineMngr.h" 
+#include "AudioManager.h"
+
+#include "raylib.h"
 
 using namespace std;
 
@@ -47,6 +49,8 @@ public:
 	GameResult GetGameResult() const { return gameResult_; }
 	void SetGameResult(GameResult result) { gameResult_ = result; }
 
+	AudioManager& GetAudio() { return audio_; }
+
 	//Maps Progression
 	void MapsForwardProgression();
 	void MapsBackwardProgression();
@@ -78,14 +82,11 @@ private:
 
 	Level NumLevel = Level::Title;
 	GameResult gameResult_ = GameResult::Playing;
+	AudioManager audio_;
 
 	static GameManager *GameMngr;
 
-	//------------
-
 	Font font = { 0 };
-	Music music = { 0 };
-	Sound fxCoin = { 0 };
 
 	StateMachineMngr* ScreenState;
 

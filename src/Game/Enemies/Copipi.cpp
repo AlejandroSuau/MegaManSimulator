@@ -13,18 +13,18 @@ void Copipi::ResetPosition()
 {
     position_ = spawnPosition_;
     velocityX_ = 0.f;
-    active_ = false;
+    isActive_ = false;
 }
 
 void Copipi::TryActivate(Vector2 playerPosition)
 {
-    if (!IsAlive() || active_) { return; }
+    if (!IsAlive() || isActive_) { return; }
 
     const float dx = playerPosition.x - position_.x;
     const float dy = playerPosition.y - position_.y;
 
     if ((dx * dx + dy * dy) <= kActivationDistance * kActivationDistance) {
-        active_ = true;
+        isActive_ = true;
         velocityX_ = dx < 0.f ? -kSpeed : kSpeed;
     }
 }
@@ -60,7 +60,7 @@ void Copipi::Kill()
 {
     health_ = 0;
     velocityX_ = 0.f;
-    active_ = false;
+    isActive_ = false;
 }
 
 void Copipi::DrawGameCharacter()

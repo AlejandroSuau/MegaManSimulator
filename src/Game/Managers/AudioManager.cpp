@@ -1,108 +1,85 @@
 #include "AudioManager.h"
 
-
-
-AudioManager::AudioManager()
-{
-
-}
-
+// We assume all path, sounds and music are correct. So no defensive checks
 
 void AudioManager::InitAudioFiles()
 {
-    InitAudioDevice();
+    if (!IsAudioDeviceReady()) { return; }
 
-    //Music
-    IntroMusic = LoadMusicStream("resources/Audio/Music//IntroTheme.mp3");	// Load Intro theme music
-    GameOverMusic = LoadMusicStream("resources/Audio/Music/GameOverTheme.mp3");
+    UnloadAudioFiles();
 
+    constexpr std::array soundPaths{
+        "resources/Audio/Sounds/buster.wav",
+        "resources/Audio/Sounds/land.wav",
+        "resources/Audio/Sounds/enemy_hit.wav",
+        "resources/Audio/Sounds/death.wav"
+    };
 
-    //Sounds
-    DeathSound = LoadSound("resources/Audio/Sounds/Death.mp3");;
-    EatingCherrySound = LoadSound("resources/Audio/Sounds/EatingCherry.mp3");;
-    EatingGhostSound = LoadSound("resources/Audio/Sounds/EatingGhost.mp3");;
-    EatingPowerPillSound = LoadSound("resources/Audio/Sounds/EatingPowerPill.mp3");;
-    GameStartSound = LoadSound("resources/Audio/Sounds/GameStart.mp3");;
-    SirenSound = LoadSound("resources/Audio/Sounds/Siren.mp3");;
-    VictorySound = LoadSound("resources/Audio/Sounds/Victory.mp3");;
-    WakaWakaSound = LoadSound("resources/Audio/Sounds/WakaWaka.mp3");;
+    constexpr std::array musicPaths{
+        "resources/Audio/Music/title.mp3",
+        "resources/Audio/Music/air_man.mp3",
+        "resources/Audio/Music/stage_clear.mp3",
+        "resources/Audio/Music/game_over.mp3"
+    };
 
-    SetMusicVolume(IntroMusic, 1.0f);
+    // Load sounds
+    for (std::size_t i = 0; i < sounds_.size(); ++i) {
+        sounds_[i] = LoadSound(soundPaths[i]);
+        SetSoundVolume(sounds_[i], 0.65f);
+    }
+
+    // Load music
+    for (std::size_t i = 0; i < music_.size(); ++i) {
+        music_[i] = LoadMusicStream(musicPaths[i]);
+        music_[i].looping =
+            i == static_cast<std::size_t>(MusicTrack::Title) ||
+            i == static_cast<std::size_t>(MusicTrack::Stage);
+
+        SetMusicVolume(music_[i], 0.35f);
+    }
 }
 
-void AudioManager::PlayIntroMusic(bool activate)
+void AudioManager::PlaySoundEffect(SoundType type)
 {
-    if(activate)
-        PlayMusicStream(IntroMusic);
-    else
-        StopMusicStream(IntroMusic);
+    const auto index = static_cast<std::size_t>(type);
+    PlaySound(sounds_[index]);
 }
 
-void AudioManager::UpdateIntroMusic()
+void AudioManager::PlayMusic(MusicTrack track)
 {
-    UpdateMusicStream(IntroMusic);
+    const int index = static_cast<int>(track);
+    if (currentTrack_ == index) { return; }
+
+    StopMusic();
+
+    currentTrack_ = index;
+    PlayMusicStream(music_[index]);
 }
 
-void AudioManager::PlayGameOverMusic(bool activate)
+void AudioManager::StopMusic()
 {
-    if (activate)
-        PlayMusicStream(GameOverMusic);
-    else
-        StopMusicStream(GameOverMusic);
+    if (currentTrack_ >= 0) {
+        StopMusicStream(music_[currentTrack_]);
+        currentTrack_ = -1;
+    }
 }
 
-void AudioManager::UpdateGameOverMusic()
+void AudioManager::Update()
 {
-    UpdateMusicStream(GameOverMusic);
-}
-
-void AudioManager::PlaySoundEffect(SoundType sound)
-{
-    switch (sound)
-    {
-    case SoundType::Death:
-        PlaySound(DeathSound);
-        break;
-    case SoundType::EatingCherry:
-        PlaySound(EatingCherrySound);
-        break;
-    case SoundType::EatingGhost:
-        PlaySound(EatingGhostSound);
-        break;
-    case SoundType::EatingPowerPill:
-        PlaySound(EatingPowerPillSound);
-        break;
-    case SoundType::GameStart:
-        PlaySound(GameStartSound);
-        break;
-    case SoundType::Siren:
-        PlaySound(SirenSound);
-        break;
-    case SoundType::Victory:
-        PlaySound(VictorySound);
-        break;
-    case SoundType::WakaWaka:
-        PlaySound(WakaWakaSound);
-        break;
-    default:
-        break;
+    if (currentTrack_ >= 0) {
+        UpdateMusicStream(music_[currentTrack_]);
     }
 }
 
 void AudioManager::UnloadAudioFiles()
 {
-    UnloadSound(DeathSound);
-    UnloadSound(EatingCherrySound);
-    UnloadSound(EatingGhostSound);
-    UnloadSound(EatingPowerPillSound);
-    UnloadSound(GameStartSound);
-    UnloadSound(SirenSound);
-    UnloadSound(VictorySound);
-    UnloadSound(WakaWakaSound);
+    StopMusic();
 
-    //CloseAudio
-    CloseAudioDevice();
+    for (auto& sound : sounds_) {
+       UnloadSound(sound);
+    }
 
+    for (auto& music : music_) {
+        UnloadMusicStream(music);
+    }
 }
-
-

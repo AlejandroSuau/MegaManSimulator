@@ -14,6 +14,8 @@ void ScreenTitleState::InitScreen(void)
 	TraceLog(LOG_INFO, "ScreenTitleState::InitScreen");
 
 	logo_ = LoadTexture("resources/Menu/MainMenu.png");
+
+	GameManager::GetGameManager().GetAudio().PlayMusic(MusicTrack::Title);
 }
 
 void ScreenTitleState::UpdateScreen(float deltaTime)

@@ -17,6 +17,12 @@ void ScreenEndingState::InitScreen(void)
 {
 	framesCounter = 0;
 	finishScreen = 0;
+
+	auto& game = GameManager::GetGameManager();
+	game.GetAudio().PlayMusic(
+		game.GetGameResult() == GameResult::Won
+		? MusicTrack::Victory
+		: MusicTrack::GameOver);
 }
 
 void ScreenEndingState::UpdateScreen(float deltaTime)
@@ -56,9 +62,7 @@ void ScreenEndingState::DrawScreen(void)
 
 void ScreenEndingState::UnloadScreen(void)
 {
-	//Let's unload all the enemies lines
-	GameManager& GameInst = GameManager::GetGameManager();
-
+	GameManager::GetGameManager().GetAudio().StopMusic();
 }
 
 int  ScreenEndingState::FinishScreen(void)

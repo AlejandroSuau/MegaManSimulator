@@ -32,6 +32,9 @@ GameManager::GameManager()
 
 void GameManager::InitGame()
 {
+    InitAudioDevice();
+    audio_.InitAudioFiles();
+
     // Setup and init first screen
     ScreenState = &ScreenLogoState::getInstance();
     ScreenState->InitScreen();
@@ -42,8 +45,9 @@ void GameManager::UpdateFrame(float deltaTime)
 {
  // Update
  //----------------------------------------------------------------------------------
+    audio_.Update();
     
-     if (!onTransition)
+    if (!onTransition)
     {
         ScreenState->UpdateScreen(deltaTime);
         
@@ -153,12 +157,12 @@ void GameManager::UnloadGame(void)
 {
     ScreenState->UnloadScreen();
 
+    audio_.UnloadAudioFiles();
+
     ClearGameVar();
 
     // Unload global data loaded
     UnloadFont(font);
-    UnloadMusicStream(music);
-    UnloadSound(fxCoin);
 
     CloseAudioDevice();     // Close audio context
 }

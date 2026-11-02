@@ -16,6 +16,7 @@ public:
     bool IsMoving() const override { return IsAlive() && velocityX_ != 0.f; }
 
     bool IsAlive() const { return health_ > 0; }
+    bool IsActive() const { return isActive_; }
     int GetHealth() const { return health_; }
 
     Rectangle GetBounds() const;
@@ -36,5 +37,5 @@ private:
 
     float velocityX_ = 0.f;
     int health_ = kDefaultHealth;
-    bool active_ = false;
+    bool isActive_ = false;
 };

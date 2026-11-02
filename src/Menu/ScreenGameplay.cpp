@@ -56,6 +56,7 @@ void ScreenGameplayState::InitScreen(void)
 	finishScreen = 0;
 	
 	auto& gameManager = GameManager::GetGameManager();
+	gameManager.GetAudio().PlayMusic(MusicTrack::Stage);
 	gameManager.SetGameResult(GameResult::Playing);
 	gameManager.ResetCamera();
 
@@ -138,8 +139,11 @@ void ScreenGameplayState::UpdateScreen(float deltaTime)
 
 	// ChecK if an enemy got hit
 	for (auto& enemy : enemies_) {
-		if (enemy.IsAlive() && player_.ConsumeProjectileHit(enemy.GetBounds())) {
+		if (enemy.IsAlive() 
+			&& enemy.IsActive()
+			&& player_.ConsumeProjectileHit(enemy.GetBounds())) {
 			enemy.TakeHit();
+			GameManager::GetGameManager().GetAudio().PlaySoundEffect(SoundType::EnemyHit);
 		}
 	}
 
@@ -223,6 +227,8 @@ void ScreenGameplayState::UnloadScreen(void)
 	UnloadTexture(redDragonTexture_);
 	UnloadTexture(blueDragonTexture_);
 	UnloadTexture(hornTexture_);
+
+	GameManager::GetGameManager().GetAudio().StopMusic();
 }
 
 int  ScreenGameplayState::FinishScreen(void)
@@ -326,6 +332,7 @@ void ScreenGameplayState::LoseLife()
 	if (playerLives_ <= 0) { return; }
 
 	--playerLives_;
+	GameManager::GetGameManager().GetAudio().PlaySoundEffect(SoundType::Death);
 	if (playerLives_ == 0) {
 		FinishGame(GameResult::Lost);
 		return;

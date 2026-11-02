@@ -2,48 +2,42 @@
 
 #include "raylib.h"
 
+#include <array>
+
 enum class SoundType
 {
-	IntroTheme = 0,
-	GameOver,
-	Death,
-	EatingCherry,
-	EatingGhost,
-	EatingPowerPill,
-	GameStart,
-	Siren,
-	Victory,
-	WakaWaka
+    Shoot,
+    Land,
+    EnemyHit,
+    Death,
+    Count
+};
+
+enum class MusicTrack
+{
+    Title,
+    Stage,
+    Victory,
+    GameOver,
+    Count
 };
 
 class AudioManager
 {
 public:
-	AudioManager();
+    void InitAudioFiles();
+    void UnloadAudioFiles();
 
-	void InitAudioFiles();
-	void UnloadAudioFiles();
+    void Update();
 
-	//Functons For music 
-	void PlayIntroMusic(bool activate);
-	void UpdateIntroMusic();
-
-	//Fuunctions for GPP Music
-	void PlayGameOverMusic(bool activate);
-	void UpdateGameOverMusic();
-
-	void PlaySoundEffect(SoundType sound);
+    void PlaySoundEffect(SoundType type);
+    void PlayMusic(MusicTrack track);
+    void StopMusic();
 
 private:
-	Music IntroMusic;
-	Music GameOverMusic;
+    // In case we add more sounds/music. Handle it dynamically through Count
+    std::array<Sound, static_cast<std::size_t>(SoundType::Count)> sounds_{};
+    std::array<Music, static_cast<std::size_t>(MusicTrack::Count)> music_{};
 
-	Sound DeathSound;
-	Sound EatingCherrySound;
-	Sound EatingGhostSound;
-	Sound EatingPowerPillSound;
-	Sound GameStartSound;
-	Sound SirenSound;
-	Sound VictorySound;
-	Sound WakaWakaSound;
+    int currentTrack_ = -1;
 };

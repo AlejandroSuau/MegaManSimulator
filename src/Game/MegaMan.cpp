@@ -170,6 +170,8 @@ void MegaMan::UpdatePhysics(
     std::span<const PlatformCollision> platforms,
     float levelWidth)
 {
+    const bool wasGrounded = canJump_;
+
     const float halfWidth = kCollisionWidth * 0.5f;
     const float halfHeight = kCollisionHeight * 0.5f;
     const float maxLevelX = std::max(halfWidth, levelWidth - halfWidth);
@@ -235,6 +237,9 @@ void MegaMan::UpdatePhysics(
     if (isLanded) {
         position_.y = landingY - halfHeight;
         currentVerticalSpeed_ = 0.0f;
+        if (!wasGrounded) {
+            GameManager::GetGameManager().GetAudio().PlaySoundEffect(SoundType::Land);
+        }
     }
 }
 
@@ -297,6 +302,8 @@ void MegaMan::UpdateShooting(float deltaTime)
         },
         direction * kProjectileSpeed,
         0.f});
+
+    GameManager::GetGameManager().GetAudio().PlaySoundEffect(SoundType::Shoot);
 
     shotCooldown_ = kShotInterval;
     shootingPoseTime_ = kShootingPoseDuration;
