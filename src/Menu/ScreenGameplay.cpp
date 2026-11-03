@@ -14,30 +14,25 @@
 
 const std::array<Rectangle, 7> ScreenGameplayState::kPlatforms{
 	// Initial floor
-	Rectangle{ 0.0f,    429.0f, 860.0f, 56.0f },
+	Rectangle{ 0.f, 455.f, 1021.f, 56.f },
 
 	//Small platforms, from left to right.
-	Rectangle{ 1341.0f, 322.0f, 110.0f, 56.0f },
-	Rectangle{ 1932.0f, 322.0f,  57.0f, 56.0f },
-	Rectangle{ 2524.0f, 268.0f,  57.0f, 56.0f },
-	Rectangle{ 3062.0f, 322.0f,  56.0f, 56.0f },
-	Rectangle{ 3600.0f, 322.0f, 164.0f, 56.0f },
+	Rectangle{ 1477.f, 341.f,  97.f, 56.f },
+	Rectangle{ 2014.f, 343.f,  48.f, 54.f },
+	Rectangle{ 2517.f, 288.f,  48.f, 52.f },
+	Rectangle{ 2996.f, 343.f,  46.f, 54.f },
+	Rectangle{ 3501.f, 341.f, 148.f, 56.f },
 
 	// Last long floor (until end).
-	Rectangle{
-		6020.0f,
-		429.0f,
-		8593.f - 6020.0f,
-		56.0f
-	}
+	Rectangle{ 5336.f, 456.f, 7588.f - 5336.f, 55.f }
 };
 
 const std::array<Vector2, 5> ScreenGameplayState::kCopipiSpawns{
-	Vector2{750.f, 374.f},
-	Vector2{1600.f, 267.f},
-	Vector2{2850.f, 267.f},
-	Vector2{3550.f, 267.f},
-	Vector2{6500.f, 374.f}
+    Vector2{  890.f, 400.f },
+    Vector2{ 1710.f, 288.f },
+    Vector2{ 2806.f, 288.f },
+    Vector2{ 3453.f, 286.f },
+    Vector2{ 6025.f, 401.f }
 };
 
 ScreenGameplayState::ScreenGameplayState()
@@ -60,7 +55,7 @@ void ScreenGameplayState::InitScreen(void)
 	gameManager.SetGameResult(GameResult::Playing);
 	gameManager.ResetCamera();
 
-	stageTexture_ = LoadTexture("resources/Game/Stages/AirManStage_Backup.png");
+	stageTexture_ = LoadTexture("resources/Game/Stages/AirManStage.png");
 
 	// Player
 	player_.InitGameCharacter();
@@ -80,20 +75,20 @@ void ScreenGameplayState::InitScreen(void)
 
 	// Lifts
 	liftTexture_ = LoadTexture("resources/Game/Enemies/Lift.png");
-	lifts_[0].Init(3900.f, 4500.f, 322.f, false, liftTexture_);
-	lifts_[1].Init(4600.f, 5200.f, 480.f, true,  liftTexture_);
-	lifts_[2].Init(5300.f, 5900.f, 322.f, false, liftTexture_);
+	lifts_[0].Init(3751.f, 4199.f, 341.f, false, liftTexture_);
+	lifts_[1].Init(4274.f, 4722.f, 491.f, true,  liftTexture_);
+	lifts_[2].Init(4798.f, 5246.f, 341.f, false, liftTexture_);
 
 	// Dragons
 	redDragonTexture_ = LoadTexture("resources/Game/Enemies/RedDemon.png");
 	blueDragonTexture_ = LoadTexture("resources/Game/Enemies/BlueDemon.png");
 	hornTexture_ = LoadTexture("resources/Game/Enemies/DragonHorn.png");
 
-	dragons_[0].Init(1100.f, 340.f, 480.f, false, redDragonTexture_, hornTexture_);
-	dragons_[1].Init(1690.f, 390.f, 480.f, true,  blueDragonTexture_, hornTexture_);
-	dragons_[2].Init(2230.f, 220.f, 310.f, false, redDragonTexture_, hornTexture_);
-	dragons_[3].Init(2820.f, 320.f, 410.f, true,  blueDragonTexture_, hornTexture_);
-	dragons_[4].Init(3360.f, 320.f, 410.f, false, redDragonTexture_, hornTexture_);
+	dragons_[0].Init(1248.f, 262.f, 402.f, false, redDragonTexture_, hornTexture_);
+	dragons_[1].Init(1784.f, 370.f, 460.f, true,  blueDragonTexture_, hornTexture_);
+	dragons_[2].Init(2291.f, 233.f, 323.f, false, redDragonTexture_, hornTexture_);
+	dragons_[3].Init(2784.f, 256.f, 346.f, true,  blueDragonTexture_, hornTexture_);
+	dragons_[4].Init(3268.f, 345.f, 435.f, false, redDragonTexture_, hornTexture_);
 
 	// HUD
 	playerIconTexture_ = LoadTexture("resources/UI/MegaManIcon.png");
@@ -188,12 +183,12 @@ void ScreenGameplayState::DrawScreen(void)
 		lift.DrawGameCharacter();
 	}
 
-	for (auto& enemy : enemies_) {
-		enemy.DrawGameCharacter();
-	}
-
 	for (auto& dragon : dragons_) {
 		dragon.DrawGameCharacter();
+	}
+
+	for (auto& enemy : enemies_) {
+		enemy.DrawGameCharacter();
 	}
 
 	player_.DrawGameCharacter();

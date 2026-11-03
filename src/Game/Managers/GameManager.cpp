@@ -26,8 +26,8 @@ GameManager& GameManager::GetGameManager()
 }
 
 GameManager::GameManager()
-{
-}
+    : font(GetFontDefault()) // no font is provided so we set it to default
+{}
 
 
 void GameManager::InitGame()
