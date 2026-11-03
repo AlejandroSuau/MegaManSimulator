@@ -24,7 +24,8 @@ void ScreenLogoState::InitScreen(void)
 {
     alpha_ = 1.0f;
 
-    logo_ = LoadTexture("resources/Logo-TheTrueBooleanGames.png");
+    // logo_ = LoadTexture("resources/Logo-TheTrueBooleanGames.png");
+    logo_ = LoadTexture("resources/the-true-boolean.png");
 }
 
 //-------------------------------------------------------------
@@ -78,7 +79,7 @@ void ScreenLogoState::DrawScreen(void)
 //-------------------------------------------------------------
 void ScreenLogoState::UnloadScreen(void)
 {
-
+    UnloadTexture(logo_);
 }
 
 //-------------------------------------------------------------

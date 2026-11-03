@@ -56,7 +56,7 @@ void ScreenEndingState::DrawScreen(void)
 	const float centerY = GetScreenHeight() * 0.5f;
 
 	drawCentered(won ? "YOU WIN!" : "GAME OVER", centerY - 140.f, 56.f, won ? GREEN : RED);
-	drawCentered("Press Enter for Playing", centerY + 35.f, 24.f, WHITE);
+	drawCentered("Press Enter for going to Title", centerY + 35.f, 24.f, WHITE);
 	drawCentered("Press 'O' for Options", centerY + 115.f, 24.f, WHITE);
 }
 

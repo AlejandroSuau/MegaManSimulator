@@ -377,6 +377,13 @@ void ScreenGameplayState::DrawHUD() const
 	const float x = margin;
 	const float y = margin;
 
+	DrawText(
+		"Dev by: Alejandro Suau",
+		static_cast<int>(x),
+		static_cast<int>(y - 20.f),
+		30,
+		WHITE);
+
 	DrawTextureV(playerIconTexture_, { x, y + 16.f }, WHITE);
 	DrawTextureV(livesMultiplierTexture_, { x + 100, y + 48.f }, WHITE);
 	
